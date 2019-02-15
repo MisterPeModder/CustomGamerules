@@ -1,0 +1,23 @@
+{
+  "id": "custom-gamerules",
+  "name": "Custom Gamerules API",
+  "description": "An API that provides ways to register gamerules and a menu",
+  "version": "1.0.0",
+  "license": "MIT",
+  "authors": [
+    "MisterPeModder"
+  ],
+  "links": {
+    "homepage": "https://minecraft.curseforge.com/projects/customgamerules",
+    "issues": "https://github.com/MisterPeModder/CustomGamerules/issues",
+    "sources": "https://github.com/MisterPeModder/CustomGamerules"
+  },
+  "side": "universal",
+  "initializers": [
+  ],
+  "requires": {},
+  "mixins": {
+    "client": "custom-gamerules.client.json",
+    "common": "custom-gamerules.common.json"
+  }
+}

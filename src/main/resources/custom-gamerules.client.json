@@ -1,0 +1,11 @@
+{
+  "required": true,
+  "package": "com.misterpemodder.customgamerules.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "BackupLevelScreenMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
