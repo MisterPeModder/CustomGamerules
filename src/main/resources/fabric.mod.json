@@ -2,7 +2,7 @@
   "id": "custom-gamerules",
   "name": "Custom Gamerules API",
   "description": "An API that provides ways to register gamerules and a menu",
-  "version": "1.0.0",
+  "version": "${version}",
   "license": "MIT",
   "authors": [
     "MisterPeModder"
@@ -13,8 +13,7 @@
     "sources": "https://github.com/MisterPeModder/CustomGamerules"
   },
   "side": "universal",
-  "initializers": [
-  ],
+  "initializers": [],
   "requires": {},
   "mixins": {
     "client": "custom-gamerules.client.json",
