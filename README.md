@@ -1,5 +1,5 @@
 CustomGamerules API  
-[![Maven Repository](https://img.shields.io/maven-metadata/v/https/maven.misterpemodder.com/list/libs-release/com/misterpemodder/customgamerules/custom-gamerules/maven-metadata.xml.svg)](https://maven.misterpemodder.com/libs-release/com/misterpemodder/customgamerules/custom-gamerules)
+[![Maven Repository](https://img.shields.io/maven-metadata/v/https/maven.misterpemodder.com/list/libs-release/com/misterpemodder/custom-gamerules/maven-metadata.xml.svg)](https://maven.misterpemodder.com/libs-release/com/misterpemodder/custom-gamerules)
 =========================
 
 A modding API that provides a way to register custom gamerules

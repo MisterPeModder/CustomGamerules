@@ -8,7 +8,7 @@ plugins {
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-group = 'com.misterpemodder.customgamerules'
+group = 'com.misterpemodder'
 archivesBaseName = 'custom-gamerules'
 version = '1.0.0'
 def mcVersion = '19w06a'
