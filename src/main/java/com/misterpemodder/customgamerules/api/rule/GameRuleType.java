@@ -1,10 +1,10 @@
-package com.misterpemodder.customgamerules.rule;
+package com.misterpemodder.customgamerules.api.rule;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import net.minecraft.world.GameRules.Type;
 
-public interface IGameRuleType<V> {
+public interface GameRuleType<V> {
   /**
    * Retrives the GameRule's default value. This value may mary.
    * 
@@ -13,7 +13,7 @@ public interface IGameRuleType<V> {
   @Nonnull
   V getDefaultValue();
 
-  IGameRuleValue<V> createValue();
+  GameRuleValue<V> createValue();
 
   /**
    * Returns the vanilla GameRule type. If you use a custom type, return {@link Type#STRING}.

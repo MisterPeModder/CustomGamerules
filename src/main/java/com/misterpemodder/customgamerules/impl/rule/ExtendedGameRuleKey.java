@@ -1,15 +1,15 @@
-package com.misterpemodder.customgamerules.impl;
+package com.misterpemodder.customgamerules.impl.rule;
 
-import com.misterpemodder.customgamerules.hook.GameRulesKeyHook;
-import com.misterpemodder.customgamerules.rule.IGameRuleType;
+import com.misterpemodder.customgamerules.impl.hook.GameRulesKeyHook;
+import com.misterpemodder.customgamerules.api.rule.GameRuleType;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.GameRules.Value;
 
 public class ExtendedGameRuleKey<V> extends GameRules.Key implements GameRulesKeyHook {
-  public IGameRuleType<V> type;
+  public GameRuleType<V> type;
   public final String modId;
 
-  public ExtendedGameRuleKey(String modId, IGameRuleType<V> type) {
+  public ExtendedGameRuleKey(String modId, GameRuleType<V> type) {
     super(type.stringify(type.getDefaultValue()), type.getMcType());
     this.type = type;
     this.modId = modId;

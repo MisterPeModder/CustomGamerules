@@ -4,7 +4,7 @@ import org.spongepowered.asm.mixin.Interface;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
-import com.misterpemodder.customgamerules.hook.GameRulesKeyHook;
+import com.misterpemodder.customgamerules.impl.hook.GameRulesKeyHook;
 import net.minecraft.world.GameRules;
 
 @Mixin(GameRules.Key.class)

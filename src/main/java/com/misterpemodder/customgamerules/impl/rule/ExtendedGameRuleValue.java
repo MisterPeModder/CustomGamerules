@@ -1,21 +1,21 @@
-package com.misterpemodder.customgamerules.impl;
+package com.misterpemodder.customgamerules.impl.rule;
 
 import java.util.function.BiConsumer;
-import com.misterpemodder.customgamerules.rule.IGameRuleType;
-import com.misterpemodder.customgamerules.rule.IGameRuleValue;
+import com.misterpemodder.customgamerules.api.rule.GameRuleType;
+import com.misterpemodder.customgamerules.api.rule.GameRuleValue;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.GameRules;
 
 public class ExtendedGameRuleValue<V> extends GameRules.Value {
-  public IGameRuleValue<V> value;
-  public IGameRuleType<V> type;
+  public GameRuleValue<V> value;
+  public GameRuleType<V> type;
 
-  public ExtendedGameRuleValue(IGameRuleValue<V> value) {
+  public ExtendedGameRuleValue(GameRuleValue<V> value) {
     this(value, (s, v) -> {
     });
   }
 
-  public ExtendedGameRuleValue(IGameRuleValue<V> value,
+  public ExtendedGameRuleValue(GameRuleValue<V> value,
       BiConsumer<MinecraftServer, GameRules.Value> onUpdate) {
     super(value.getGameRuleType().stringify(value.getValue()), value.getGameRuleType().getMcType(),
         onUpdate);

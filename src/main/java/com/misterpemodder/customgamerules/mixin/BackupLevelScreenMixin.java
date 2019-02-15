@@ -4,7 +4,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import com.misterpemodder.customgamerules.gui.EditGameRulesButtonWidget;
+import com.misterpemodder.customgamerules.impl.gui.EditGameRulesButtonWidget;
 import net.minecraft.client.gui.Screen;
 import net.minecraft.client.gui.menu.BackupLevelScreen;
 import net.minecraft.client.resource.language.I18n;

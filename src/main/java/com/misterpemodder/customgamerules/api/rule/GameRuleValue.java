@@ -1,4 +1,4 @@
-package com.misterpemodder.customgamerules.rule;
+package com.misterpemodder.customgamerules.api.rule;
 
 import javax.annotation.Nullable;
 import net.minecraft.server.MinecraftServer;
@@ -8,7 +8,7 @@ import net.minecraft.server.MinecraftServer;
  * 
  * @param <V> the value type.
  */
-public interface IGameRuleValue<V> {
+public interface GameRuleValue<V> {
   /**
    * @return This GameRule's current value.
    */
@@ -24,5 +24,5 @@ public interface IGameRuleValue<V> {
   /**
    * @return The GameRuleType.
    */
-  IGameRuleType<V> getGameRuleType();
+  GameRuleType<V> getGameRuleType();
 }

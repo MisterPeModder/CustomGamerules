@@ -1,9 +1,9 @@
-package com.misterpemodder.customgamerules.gui;
+package com.misterpemodder.customgamerules.impl.gui;
 
 import java.util.Arrays;
 import java.util.List;
 import com.google.common.collect.ImmutableMap;
-import com.misterpemodder.customgamerules.hook.GameRulesKeyHook;
+import com.misterpemodder.customgamerules.impl.hook.GameRulesKeyHook;
 import net.fabricmc.loader.FabricLoader;
 import net.fabricmc.loader.ModContainer;
 import net.fabricmc.loader.ModInfo;

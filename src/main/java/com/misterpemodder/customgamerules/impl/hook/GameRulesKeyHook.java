@@ -1,4 +1,4 @@
-package com.misterpemodder.customgamerules.hook;
+package com.misterpemodder.customgamerules.impl.hook;
 
 import net.minecraft.world.GameRules;
 
