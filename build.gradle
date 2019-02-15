@@ -60,9 +60,9 @@ if (rootProject.file('auth.gradle').exists()) {
 
 curseforge {
 	if (project.hasProperty('curseApiKey'))
-	  apiKey = curse.apiKey
+	  apiKey = project.properties.curseApiKey
 	project {
-		id = '310323'
+		id = '314538'
 		changelog = parseChangelog('changelog.txt')
 		releaseType = 'release'
 		addGameVersion '1.14-Snapshot'
@@ -80,7 +80,7 @@ curseforge {
 
 afterEvaluate {
 	// Manually set dependsOn because curseforge doesn't set one.
-  tasks.curseforge310323.dependsOn remapJar
+  tasks.curseforge314538.dependsOn remapJar
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
