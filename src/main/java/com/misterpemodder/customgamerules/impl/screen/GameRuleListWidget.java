@@ -1,4 +1,4 @@
-package com.misterpemodder.customgamerules.impl.gui;
+package com.misterpemodder.customgamerules.impl.screen;
 
 import java.util.Locale;
 import java.util.TreeMap;

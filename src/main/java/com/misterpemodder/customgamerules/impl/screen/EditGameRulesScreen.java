@@ -1,4 +1,4 @@
-package com.misterpemodder.customgamerules.impl.gui;
+package com.misterpemodder.customgamerules.impl.screen;
 
 import java.util.List;
 import org.lwjgl.glfw.GLFW;
@@ -28,28 +28,29 @@ public class EditGameRulesScreen extends Screen {
   @Override
   protected void onInitialized() {
     this.client.keyboard.enableRepeatEvents(true);
-    this.addButton(new ButtonWidget(1, this.width / 2 - 154, this.height - 28, 150, 20,
+    this.addButton(new ButtonWidget(this.width / 2 - 154, this.height - 28, 150, 20,
         I18n.translate("selectWorld.edit.save")) {
       @Override
       public void onPressed(double double_1, double double_2) {
         client.openScreen(EditGameRulesScreen.this.parent);
       }
     });
-    this.addButton(new ButtonWidget(0, this.width / 2 + 4, this.height - 28, 150, 20,
+    this.addButton(new ButtonWidget(this.width / 2 + 4, this.height - 28, 150, 20,
         I18n.translate("gui.cancel")) {
       @Override
       public void onPressed(double double_1, double double_2) {
         client.openScreen(EditGameRulesScreen.this.parent);
       }
     });
-    (this.textField = new TextFieldWidget(2, this.fontRenderer, this.width / 2 - 100, 22, 200, 20) {
+    (this.textField = new TextFieldWidget(this.fontRenderer, this.width / 2 - 100, 22, 200, 20) {
       @Override
       public void setFocused(boolean focused) {
         super.setFocused(true);
       }
-    }).setChangedListener((i, text) -> {
+    }).setChangedListener(text -> {
       this.gameRuleList.filter(() -> text, false);
-      this.textField.method_1868(this.gameRuleList.getEntries().isEmpty() ? 0xff5555 : 0xe0e0e0);
+      this.textField
+          .method_1868(this.gameRuleList.getInputListeners().isEmpty() ? 0xff5555 : 0xe0e0e0);
     });
     this.gameRuleList = new GameRuleListWidget(this, this.client, this.width, this.height, 48,
         this.height - 36, 18, () -> this.textField.getText());
@@ -78,7 +79,7 @@ public class EditGameRulesScreen extends Screen {
       return this.textField.keyPressed(keyCode, scanCode, modifiers);
     if (this.gameRuleList.selected == null)
       return true;
-    List<GameRuleListEntryWidget> entries = this.gameRuleList.getEntries();
+    List<GameRuleListEntryWidget> entries = this.gameRuleList.getInputListeners();
     int id = entries.indexOf(this.gameRuleList.selected) + (down ? 1 : -1);
     if (id >= 0 && id < entries.size())
       this.gameRuleList.selected = entries.get(id);
@@ -101,9 +102,9 @@ public class EditGameRulesScreen extends Screen {
     this.gameRuleList.draw(mouseX, mouseY, delta);
     this.drawString(this.fontRenderer, I18n.translate("customgamerules.search"),
         this.width / 2 - 100, 9, 0xa0a0a0);
-    this.textField.render(mouseX, mouseY, delta);
+    this.textField.draw(mouseX, mouseY, delta);
     super.draw(mouseX, mouseY, delta);
-    for (GameRuleListEntryWidget entry : this.gameRuleList.getEntries()) {
+    for (GameRuleListEntryWidget entry : this.gameRuleList.getInputListeners()) {
       int x = entry.getX();
       int y = entry.getY();
       if (mouseX >= x && mouseY >= y && mouseX < x + this.gameRuleList.getEntryWidth()

@@ -1,19 +1,17 @@
-package com.misterpemodder.customgamerules.impl.gui;
+package com.misterpemodder.customgamerules.impl.screen;
 
 import java.util.Arrays;
 import java.util.List;
 import com.google.common.collect.ImmutableMap;
 import com.misterpemodder.customgamerules.impl.hook.GameRulesKeyHook;
-import net.fabricmc.loader.FabricLoader;
-import net.fabricmc.loader.ModContainer;
-import net.fabricmc.loader.ModInfo;
+import net.fabricmc.loader.api.metadata.ModMetadata;
+import net.fabricmc.loader.api.ModContainer;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.widget.EntryListWidget;
 import net.minecraft.text.TextFormat;
 import net.minecraft.world.GameRules;
 
-@SuppressWarnings("deprecation")
 public class GameRuleListEntryWidget extends EntryListWidget.Entry<GameRuleListEntryWidget> {
   private final String ruleName;
   private final GameRules.Key ruleKey;
@@ -25,10 +23,10 @@ public class GameRuleListEntryWidget extends EntryListWidget.Entry<GameRuleListE
 
   static {
     ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
-    // Using FabricLoader.INSTANCE because there is currently no way of querying mods using the API.
-    for (ModContainer modContainer : FabricLoader.INSTANCE.getModContainers()) {
-      ModInfo modInfo = modContainer.getInfo();
-      builder.put(modInfo.getId(), modInfo.getName());
+    FabricLoader.getInstance();
+    for (ModContainer modContainer : FabricLoader.getInstance().getAllMods()) {
+      ModMetadata meta = modContainer.getMetadata();
+      builder.put(meta.getId(), meta.getName());
     }
     builder.put("minecraft", "Minecraft");
     MODID_TO_NAME = builder.build();
@@ -48,12 +46,12 @@ public class GameRuleListEntryWidget extends EntryListWidget.Entry<GameRuleListE
   @Override
   public void draw(int width, int height, int var3, int var4, boolean selected, float delta) {
     if (this.list.selected == this) {
-      int x = getX();
-      int y = getY();
-      Drawable.drawRect(x - 2, y - 2, x - 2 + width - 15, y - 2 + 18, 0xFF808080);
-      Drawable.drawRect(x - 1, y - 1, x - 3 + width - 15, y - 3 + 18, 0xFF000000);
+      // int x = getX();
+      // int y = getY();
+      // Drawable.drawRect(x - 2, y - 2, x - 2 + width - 15, y - 2 + 18, 0xFF808080);
+      // Drawable.drawRect(x - 1, y - 1, x - 3 + width - 15, y - 3 + 18, 0xFF000000);
     }
-    this.client.fontRenderer.draw(this.ruleName, this.getX() + 32 + 3, this.getY() + 1, 0xffffff);
+    this.client.textRenderer.draw(this.ruleName, this.getX() + 32 + 3, this.getY() + 1, 0xffffff);
   }
 
   @Override
