@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import com.misterpemodder.customgamerules.api.GameRuleRegistry;
 import com.misterpemodder.customgamerules.api.rule.GameRuleType;
+import com.misterpemodder.customgamerules.impl.command.DynamicGameRuleCommand;
 import com.misterpemodder.customgamerules.impl.rule.ExtendedGameRuleKey;
 import com.misterpemodder.customgamerules.impl.rule.ModGameRuleKey;
 import net.minecraft.server.MinecraftServer;
@@ -14,18 +15,21 @@ public class GameRuleRegistryImpl implements GameRuleRegistry {
   @Override
   public void registerGameRule(String modId, String name, GameRuleType<?> type) {
     GameRules.getKeys().put(name, new ExtendedGameRuleKey<>(modId, type));
+    DynamicGameRuleCommand.addGameRule(name, type.getMcType());
   }
 
   @Override
   public void registerGameRule(String modId, String name, String defaultValue,
       GameRules.Type type) {
     GameRules.getKeys().put(name, new ModGameRuleKey(modId, defaultValue, type));
+    DynamicGameRuleCommand.addGameRule(name, type);
   }
 
   @Override
   public void registerGameRule(String modId, String name, String defaultValue, GameRules.Type type,
       BiConsumer<MinecraftServer, GameRules.Value> onUpdate) {
     GameRules.getKeys().put(name, new ModGameRuleKey(modId, defaultValue, type, onUpdate));
+    DynamicGameRuleCommand.addGameRule(name, type);
   }
 
   @Override

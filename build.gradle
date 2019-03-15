@@ -10,7 +10,7 @@ targetCompatibility = 1.8
 
 group = 'com.misterpemodder'
 archivesBaseName = 'custom-gamerules'
-version = '1.0.2'
+version = '1.0.3'
 def mcVersion = '19w08b'
 
 minecraft {
@@ -115,12 +115,12 @@ uploadArchives {
 		}
 	} else if (project.hasProperty("mavenUser") && project.hasProperty("mavenPass")) {
     repositories.mavenDeployer {
-        repository(url: 'https://maven.misterpemodder.com/libs-release/') {
-            authentication(userName: project.properties.mavenUser, password: project.properties.mavenPass)
-        }
-        snapshotRepository(url: 'https://maven.misterpemodder.com/libs-snapshot/') {
-            authentication(userName: project.properties.mavenUser, password: project.properties.mavenPass)
-        }
+      repository(url: 'https://maven.misterpemodder.com/libs-release/') {
+          authentication(userName: project.properties.mavenUser, password: project.properties.mavenPass)
+      }
+      snapshotRepository(url: 'https://maven.misterpemodder.com/libs-snapshot/') {
+          authentication(userName: project.properties.mavenUser, password: project.properties.mavenPass)
+      }
     }
 	} else {
 		println "ext properties 'mavenUser' and 'mavenPass' are not defined"
