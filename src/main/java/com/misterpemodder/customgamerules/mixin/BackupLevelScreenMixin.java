@@ -14,7 +14,7 @@ import net.minecraft.client.resource.language.I18n;
 public abstract class BackupLevelScreenMixin extends Screen {
   @Inject(at = @At("TAIL"), method = "onInitialized()V")
   protected void onOnInitialized(CallbackInfo ci) {
-    this.addButton(new EditGameRulesButtonWidget(this, this.width / 2 - 100,
-        this.height / 4 + 168 + 5, I18n.translate("customgamerules.edit")));
+    this.addButton(new EditGameRulesButtonWidget(this, this.screenWidth / 2 - 100,
+        this.screenHeight / 4 + 168 + 5, I18n.translate("customgamerules.edit")));
   }
 }

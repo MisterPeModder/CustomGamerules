@@ -13,7 +13,7 @@ public class EditGameRulesButtonWidget extends ButtonWidget {
   }
 
   @Override
-  public void onPressed(double x, double y) {
+  public void onPressed() {
     MinecraftClient.getInstance().openScreen(new EditGameRulesScreen(this.containingScreen));
   }
 }

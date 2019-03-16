@@ -28,41 +28,42 @@ public class EditGameRulesScreen extends Screen {
   @Override
   protected void onInitialized() {
     this.client.keyboard.enableRepeatEvents(true);
-    this.addButton(new ButtonWidget(this.width / 2 - 154, this.height - 28, 150, 20,
+    this.addButton(new ButtonWidget(this.screenWidth / 2 - 154, this.screenHeight - 28, 150, 20,
         I18n.translate("selectWorld.edit.save")) {
       @Override
-      public void onPressed(double double_1, double double_2) {
+      public void onPressed() {
         client.openScreen(EditGameRulesScreen.this.parent);
       }
     });
-    this.addButton(new ButtonWidget(this.width / 2 + 4, this.height - 28, 150, 20,
+    this.addButton(new ButtonWidget(this.screenWidth / 2 + 4, this.screenHeight - 28, 150, 20,
         I18n.translate("gui.cancel")) {
       @Override
-      public void onPressed(double double_1, double double_2) {
+      public void onPressed() {
         client.openScreen(EditGameRulesScreen.this.parent);
       }
     });
-    (this.textField = new TextFieldWidget(this.fontRenderer, this.width / 2 - 100, 22, 200, 20) {
-      @Override
-      public void setFocused(boolean focused) {
-        super.setFocused(true);
-      }
-    }).setChangedListener(text -> {
-      this.gameRuleList.filter(() -> text, false);
-      this.textField
-          .method_1868(this.gameRuleList.getInputListeners().isEmpty() ? 0xff5555 : 0xe0e0e0);
-    });
-    this.gameRuleList = new GameRuleListWidget(this, this.client, this.width, this.height, 48,
-        this.height - 36, 18, () -> this.textField.getText());
+    (this.textField =
+        new TextFieldWidget(this.fontRenderer, this.screenWidth / 2 - 100, 22, 200, 20) {
+          @Override
+          public void setFocused(boolean focused) {
+            super.setFocused(true);
+          }
+        }).setChangedListener(text -> {
+          this.gameRuleList.filter(() -> text, false);
+          this.textField
+              .method_1868(this.gameRuleList.getInputListeners().isEmpty() ? 0xff5555 : 0xe0e0e0);
+        });
+    this.gameRuleList = new GameRuleListWidget(this, this.client, this.screenWidth,
+        this.screenHeight, 48, this.screenHeight - 36, 18, () -> this.textField.getText());
     this.textField.setFocused(true);
     this.listeners.add(this.gameRuleList);
     this.listeners.add(this.textField);
   }
 
   @Override
-  public void onScaleChanged(MinecraftClient client, int width, int height) {
+  public void onScaleChanged(MinecraftClient client, int screenWidth, int screenHeight) {
     String text = this.textField.getText();
-    this.initialize(client, width, height);
+    this.initialize(client, screenWidth, screenHeight);
     this.textField.setText(text);
   }
 
@@ -86,7 +87,7 @@ public class EditGameRulesScreen extends Screen {
     int y = this.gameRuleList.selected.getY();
     if (y < 40)
       this.gameRuleList.scroll(-18);
-    else if (y > this.height - 50)
+    else if (y > this.screenHeight - 50)
       this.gameRuleList.scroll(18);
     return true;
   }
@@ -101,7 +102,7 @@ public class EditGameRulesScreen extends Screen {
     drawBackground();
     this.gameRuleList.draw(mouseX, mouseY, delta);
     this.drawString(this.fontRenderer, I18n.translate("customgamerules.search"),
-        this.width / 2 - 100, 9, 0xa0a0a0);
+        this.screenWidth / 2 - 100, 9, 0xa0a0a0);
     this.textField.draw(mouseX, mouseY, delta);
     super.draw(mouseX, mouseY, delta);
     for (GameRuleListEntryWidget entry : this.gameRuleList.getInputListeners()) {
