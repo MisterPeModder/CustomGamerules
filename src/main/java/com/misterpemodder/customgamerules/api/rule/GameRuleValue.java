@@ -17,7 +17,7 @@ public interface GameRuleValue<V> {
   /**
    * @param value  the new value.
    * @param server the MinecraftServer instance, may be null.
-   * @return The value that the GameRule will have.
+   * @param <T>    the value type.
    */
   <T extends V> void setValue(T value, @Nullable MinecraftServer server);
 

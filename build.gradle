@@ -1,17 +1,16 @@
 plugins {
 	id 'fabric-loom' version '0.2.0-SNAPSHOT'
 	id 'com.matthewprenger.cursegradle' version "1.1.2"
-	id "com.jfrog.artifactory" version "4.9.1"
-	id "maven"
- }
+	id "signing"
+	id "maven-publish"
+}
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-group = 'com.misterpemodder'
-archivesBaseName = 'custom-gamerules'
-version = '1.0.5'
-def mcVersion = '19w12b'
+group = projectGroup
+archivesBaseName = projectArchiveBaseName
+version = projectVersion
 
 minecraft {
 }
@@ -24,7 +23,7 @@ repositories {
 
 dependencies {
 	minecraft "com.mojang:minecraft:$mcVersion"
-	mappings "net.fabricmc:yarn:$mcVersion.1"
+	mappings "net.fabricmc:yarn:$mcVersion.$mcMappings"
 	modCompile "net.fabricmc:fabric-loader:0.3.7.109"
 	modCompile "net.fabricmc:fabric:0.2.5.114"
 
@@ -55,8 +54,106 @@ String parseChangelog(String path) {
 }
 
 // Contains curse token, maven user and password.
-if (rootProject.file('auth.gradle').exists()) {
-	apply from: 'auth.gradle'
+if (rootProject.file('private.gradle').exists()) {
+	apply from: 'private.gradle'
+}
+
+processResources {
+  from(sourceSets.main.resources.srcDirs) {
+      include 'fabric.mod.json'
+      expand 'version': project.version
+  }
+  from(sourceSets.main.resources.srcDirs) {
+      exclude 'fabric.mod.json'
+  }
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+	classifier = 'sources'
+	from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+	classifier = "javadoc"
+	from javadoc.destinationDir
+}
+
+artifacts {
+  archives(jar.archivePath) {
+    builtBy remapJar
+  }
+  archives(sourcesJar.archivePath) {
+    builtBy remapSourcesJar
+  }
+  archives(javadocJar.archivePath) {
+    builtBy javadocJar
+  }
+}
+
+publishing {
+	publications {
+		mavenPrimary(MavenPublication) {
+			from components.java
+
+			groupId = project.group
+			artifactId = project.name
+			version = project.version
+
+			artifact sourcesJar
+			artifact javadocJar
+
+			pom {
+				name = "Custom Gamerules"
+				description = project.description
+				url = "https://github.com/MisterPeModder/CustomGamerules"
+
+				developers {
+					developer {
+						id = "misterpemodder"
+						name = "Yanis Guaye"
+						email = "yguaye44@gmail.com"
+					}
+				}
+
+				licenses {
+					license {
+						name = "MIT License"
+						url = "https://opensource.org/licenses/MIT"
+						distribution = "repo"
+					}
+				}
+
+				scm {
+					url = "https://github.com/MisterPeModder/CustomGamerules"
+					connection = "scm:git:git@github.com:MisterPeModder/CustomGamerules.git"
+					developerConnection = "scm:git:git@github.com:MisterPeModder/CustomGamerules.git"
+				}
+			}
+		}
+	}
+
+	repositories {
+		if (project.hasProperty("mavenUser") && project.hasProperty("mavenPass")) {
+			maven {
+				url isSnapshot == 'true' ? mavenSnapshotRepo : mavenReleaseRepo
+				credentials {
+					username = project.properties.mavenUser
+					password = project.properties.mavenPass
+				}
+			}
+		} else {
+			println("properties mavenUser and/or mavenPass are not defined!")
+		}
+	}
+}
+
+signing {
+	if (project.hasProperty("signing.keyId")) {
+		sign configurations.archives;
+		sign publishing.publications.mavenPrimary
+	} else {
+		println("$name: skipping jar signing");
+	}
 }
 
 curseforge {
@@ -82,69 +179,4 @@ curseforge {
 afterEvaluate {
 	// Manually set dependsOn because curseforge doesn't set one.
   tasks.curseforge314538.dependsOn remapJar
-}
-
-processResources {
-  from(sourceSets.main.resources.srcDirs) {
-      include 'fabric.mod.json'
-      expand 'version': project.version
-  }
-  from(sourceSets.main.resources.srcDirs) {
-      exclude 'fabric.mod.json'
-  }
-}
-
-task sourcesJar(type: Jar, dependsOn: classes) {
-	classifier = 'sources'
-	from sourceSets.main.allSource
-}
-
-artifacts {
-  archives(jar.archivePath) {
-    builtBy remapJar
-  }
-  archives(sourcesJar.archivePath) {
-    builtBy remapSourcesJar
-  }
-}
-
-uploadArchives {
-	// If localMavenUrl ext property is spupplied, publish to local maven.
-	if (project.hasProperty("localMavenUrl")) {
-		repositories.mavenDeployer {
-			repository(url: project.properties.localMavenUrl)
-		}
-	} else if (project.hasProperty("mavenUser") && project.hasProperty("mavenPass")) {
-    repositories.mavenDeployer {
-      repository(url: 'https://maven.misterpemodder.com/libs-release/') {
-          authentication(userName: project.properties.mavenUser, password: project.properties.mavenPass)
-      }
-      snapshotRepository(url: 'https://maven.misterpemodder.com/libs-snapshot/') {
-          authentication(userName: project.properties.mavenUser, password: project.properties.mavenPass)
-      }
-    }
-	} else {
-		println "ext properties 'mavenUser' and 'mavenPass' are not defined"
-	}
-}
-
-artifactory {
-	if (project.hasProperty("artifactoryUser") && project.hasProperty("artifactoryPass")) {
-		contextUrl = 'https://maven.misterpemodder.com/'
-		publish {
-			repository {
-				repoKey = "libs-release"
-				username = artifactoryUser
-				password = artifactoryPass
-			}
-			defaults {
-				publications('maven')
-
-				publishArtifacts = true
-				publishPom = true
-			}
-		}
-	} else {
-		println "ext properties 'artifactoryUser' and 'artifactoryPass' are not defined"
-	}
 }

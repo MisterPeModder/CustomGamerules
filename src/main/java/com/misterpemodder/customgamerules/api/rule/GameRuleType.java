@@ -25,9 +25,9 @@ public interface GameRuleType<V> {
   /**
    * Attemps to parse a value of type V
    * 
-   * @param source
-   * @return
-   * @throws NumberFormatException
+   * @param source The source string.
+   * @return The parsed value.
+   * @throws NumberFormatException If parsing failed.
    */
   @Nullable
   V parse(String source) throws NumberFormatException;
@@ -39,7 +39,7 @@ public interface GameRuleType<V> {
   }
 
   /**
-   * Returns the string representation of the current type.
+   * @return the string representation of the current type.
    */
   String getTypeName();
 }

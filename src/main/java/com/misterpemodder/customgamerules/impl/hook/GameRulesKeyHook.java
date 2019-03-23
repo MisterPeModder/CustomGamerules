@@ -25,7 +25,7 @@ public interface GameRulesKeyHook {
   }
 
   /**
-   * Returns the string representation of the gamerule's type.
+   * @return The string representation of the gamerule's type.
    */
   default String getTypeName() {
     return "";
