@@ -10,8 +10,8 @@ targetCompatibility = 1.8
 
 group = 'com.misterpemodder'
 archivesBaseName = 'custom-gamerules'
-version = '1.0.4'
-def mcVersion = '19w11b'
+version = '1.0.5'
+def mcVersion = '19w12b'
 
 minecraft {
 }
@@ -24,9 +24,9 @@ repositories {
 
 dependencies {
 	minecraft "com.mojang:minecraft:$mcVersion"
-	mappings "net.fabricmc:yarn:$mcVersion.4"
+	mappings "net.fabricmc:yarn:$mcVersion.1"
 	modCompile "net.fabricmc:fabric-loader:0.3.7.109"
-	modCompile "net.fabricmc:fabric:0.2.3.111"
+	modCompile "net.fabricmc:fabric:0.2.5.114"
 
 	// Dev mode
 	// modCompile "com.jamieswhiteshirt:developer-mode:1.0.3"

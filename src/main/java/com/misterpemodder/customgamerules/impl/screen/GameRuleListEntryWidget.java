@@ -45,7 +45,7 @@ public class GameRuleListEntryWidget extends EntryListWidget.Entry<GameRuleListE
 
   @Override
   public void draw(int width, int height, int var3, int var4, boolean selected, float delta) {
-    if (this.list.selected == this) {
+    if (selected) {
       // int x = getX();
       // int y = getY();
       // Drawable.drawRect(x - 2, y - 2, x - 2 + width - 15, y - 2 + 18, 0xFF808080);
@@ -65,9 +65,9 @@ public class GameRuleListEntryWidget extends EntryListWidget.Entry<GameRuleListE
   }
 
   @Override
-  public boolean mouseClicked(double v, double v1, int i) {
-    list.selected = this;
-    return true;
+  public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    this.list.setSelected(this.method_1908());
+    return false;
   }
 
   public List<String> getTooltip() {

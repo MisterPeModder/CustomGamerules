@@ -1,70 +1,65 @@
 package com.misterpemodder.customgamerules.impl.screen;
 
-import java.util.List;
-import org.lwjgl.glfw.GLFW;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.InputListener;
 import net.minecraft.client.gui.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.resource.language.I18n;
+import net.minecraft.text.TranslatableTextComponent;
 
 /**
  * WIP
  */
 public class EditGameRulesScreen extends Screen {
   public final Screen parent;
-  private TextFieldWidget textField;
+  private TextFieldWidget searchBox;
   private GameRuleListWidget gameRuleList;
+  private ButtonWidget saveButton;
+  private ButtonWidget cancelButton;
 
   public EditGameRulesScreen(Screen parent) {
+    super(new TranslatableTextComponent("customgamerules.edit.title"));
     this.parent = parent;
   }
 
   @Override
   public void update() {
-    this.textField.tick();
+    this.searchBox.tick();
   }
 
   @Override
   protected void onInitialized() {
     this.client.keyboard.enableRepeatEvents(true);
-    this.addButton(new ButtonWidget(this.screenWidth / 2 - 154, this.screenHeight - 28, 150, 20,
-        I18n.translate("selectWorld.edit.save")) {
-      @Override
-      public void onPressed() {
-        client.openScreen(EditGameRulesScreen.this.parent);
-      }
-    });
-    this.addButton(new ButtonWidget(this.screenWidth / 2 + 4, this.screenHeight - 28, 150, 20,
-        I18n.translate("gui.cancel")) {
-      @Override
-      public void onPressed() {
-        client.openScreen(EditGameRulesScreen.this.parent);
-      }
-    });
-    (this.textField =
+    this.saveButton = addButton(new ButtonWidget(this.screenWidth / 2 - 154, this.screenHeight - 28,
+        150, 20, I18n.translate("selectWorld.edit.save"), new OpenScreenButtonAction(this.parent)));
+    this.cancelButton = addButton(new ButtonWidget(this.screenWidth / 2 + 4, this.screenHeight - 28,
+        150, 20, I18n.translate("gui.cancel"), new OpenScreenButtonAction(this.parent)));
+    (this.searchBox =
         new TextFieldWidget(this.fontRenderer, this.screenWidth / 2 - 100, 22, 200, 20) {
           @Override
           public void setFocused(boolean focused) {
-            super.setFocused(true);
+            super.setFocused(focused);
           }
         }).setChangedListener(text -> {
           this.gameRuleList.filter(() -> text, false);
-          this.textField
+          this.searchBox
               .method_1868(this.gameRuleList.getInputListeners().isEmpty() ? 0xff5555 : 0xe0e0e0);
         });
     this.gameRuleList = new GameRuleListWidget(this, this.client, this.screenWidth,
-        this.screenHeight, 48, this.screenHeight - 36, 18, () -> this.textField.getText());
-    this.textField.setFocused(true);
+        this.screenHeight, 48, this.screenHeight - 36, 18, () -> this.searchBox.getText());
+    this.searchBox.setFocused(true);
+    this.listeners.add(this.searchBox);
     this.listeners.add(this.gameRuleList);
-    this.listeners.add(this.textField);
+    focusOn(this.searchBox);
+    enableButtons(true);
   }
 
   @Override
   public void onScaleChanged(MinecraftClient client, int screenWidth, int screenHeight) {
-    String text = this.textField.getText();
+    String text = this.searchBox.getText();
     this.initialize(client, screenWidth, screenHeight);
-    this.textField.setText(text);
+    this.searchBox.setText(text);
   }
 
   @Override
@@ -74,8 +69,9 @@ public class EditGameRulesScreen extends Screen {
 
   @Override
   public boolean keyPressed(final int keyCode, final int scanCode, final int modifiers) {
-    boolean down;
+    //boolean down;
 
+    /*
     if (!(down = keyCode == GLFW.GLFW_KEY_DOWN) && keyCode != GLFW.GLFW_KEY_UP)
       return this.textField.keyPressed(keyCode, scanCode, modifiers);
     if (this.gameRuleList.selected == null)
@@ -88,23 +84,25 @@ public class EditGameRulesScreen extends Screen {
     if (y < 40)
       this.gameRuleList.scroll(-18);
     else if (y > this.screenHeight - 50)
-      this.gameRuleList.scroll(18);
-    return true;
+      this.gameRuleList.scroll(18);*/
+    return super.keyPressed(keyCode, scanCode, modifiers);
   }
 
   @Override
   public boolean charTyped(final char chr, final int keyCode) {
-    return this.textField.charTyped(chr, keyCode);
+    if (getFocused() == this.searchBox)
+      return this.searchBox.charTyped(chr, keyCode);
+    return super.charTyped(chr, keyCode);
   }
 
   @Override
-  public void draw(final int mouseX, final int mouseY, final float delta) {
+  public void render(final int mouseX, final int mouseY, final float delta) {
     drawBackground();
-    this.gameRuleList.draw(mouseX, mouseY, delta);
+    this.gameRuleList.render(mouseX, mouseY, delta);
     this.drawString(this.fontRenderer, I18n.translate("customgamerules.search"),
         this.screenWidth / 2 - 100, 9, 0xa0a0a0);
-    this.textField.draw(mouseX, mouseY, delta);
-    super.draw(mouseX, mouseY, delta);
+    this.searchBox.render(mouseX, mouseY, delta);
+    super.render(mouseX, mouseY, delta);
     for (GameRuleListEntryWidget entry : this.gameRuleList.getInputListeners()) {
       int x = entry.getX();
       int y = entry.getY();
@@ -113,5 +111,33 @@ public class EditGameRulesScreen extends Screen {
         drawTooltip(entry.getTooltip(), mouseX, mouseY);
       }
     }
+  }
+
+  @Override
+  public void focusNext() {
+    /*if (true) {
+      List<GameRuleListEntryWidget> entries = this.gameRuleList.getInputListeners();
+      int id = entries.indexOf(this.gameRuleList.selected) + 1;
+      if (id < entries.size()) {
+        this.gameRuleList.selected = entries.get(id);
+      }
+    }*/
+    super.focusNext();
+  }
+
+  @Override
+  public void focusPrevious() {
+    super.focusPrevious();
+  }
+
+  @Override
+  public void setFocused(InputListener inputListener) {
+    this.searchBox.setFocused(inputListener == this.searchBox);
+    super.setFocused(inputListener);
+  }
+
+  public void enableButtons(boolean enable) {
+    this.saveButton.active = enable;
+    this.cancelButton.active = enable;
   }
 }
