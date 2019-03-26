@@ -1,24 +1,78 @@
 package com.misterpemodder.customgamerules.impl.screen;
 
-import java.util.Locale;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.function.Supplier;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import com.misterpemodder.customgamerules.impl.Util;
+import com.misterpemodder.customgamerules.impl.hook.GameRulesKeyHook;
+import com.misterpemodder.customgamerules.mixin.client.TextFieldPosAccessor;
+import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.EntryListWidget;
+import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.GameRules;
 
-public class GameRuleListWidget extends EntryListWidget<GameRuleListEntryWidget> {
-  private EditGameRulesScreen parent;
+public class GameRuleListWidget extends EntryListWidget<GameRuleListWidget.Entry> {
+  private EditGameRulesScreen gui;
   private int selectedId;
+  private int maxStringWidth;
+
+  private final Map<String, Set<GameRuleEntry>> gamerules;
+  private static final Pattern SEARCH_PATTERN = Pattern.compile("^(@\\s*([^\\s]*))?((\\s*)(.*))?");
 
   public GameRuleListWidget(EditGameRulesScreen gui, MinecraftClient client, int width, int height,
       int y1, int y2, int entryHeight, Supplier<String> filter) {
     super(client, width, height, y1, y2, entryHeight);
-    this.filter(filter, false);
-    this.parent = gui;
+    this.gui = gui;
+    this.gamerules = getGamerules();
     this.selectedId = -1;
+    filter(filter);
+
+    this.maxStringWidth = 0;
+    for (Set<GameRuleEntry> rules : this.gamerules.values())
+      for (GameRuleEntry rule : rules)
+        this.maxStringWidth =
+            Math.max(this.maxStringWidth, this.client.textRenderer.getStringWidth(rule.ruleName));
+  }
+
+  private Map<String, Set<GameRuleEntry>> getGamerules() {
+    TreeMap<String, GameRules.Key> rules = GameRules.getKeys();
+    if (rules == null)
+      return new HashMap<>();
+    Map<String, String> modIdToName =
+        FabricLoader.getInstance().getAllMods().stream().map(m -> m.getMetadata())
+            .collect(Collectors.toMap(ModMetadata::getId, ModMetadata::getName));
+    modIdToName.put("minecraft", "Minecraft");
+    Map<String, Set<GameRuleEntry>> ret = new TreeMap<>();
+    for (Map.Entry<String, GameRules.Key> rule : rules.entrySet()) {
+      String modId = ((GameRulesKeyHook) rule.getValue()).getModId();
+      if (modId == null || modId.isEmpty())
+        modId = Util.translate("customgamerules.mod.unknown", "Unknown");
+      String modName = modIdToName.get(modId);
+      if (modName == null)
+        modName = modId;
+      Set<GameRuleEntry> entries = ret.get(modName);
+      if (entries == null) {
+        entries = new TreeSet<>();
+        ret.put(modName, entries);
+      }
+      entries.add(
+          new GameRuleEntry(rule.getKey(), rule.getValue(), this.gui.rules.get(rule.getKey())));
+    }
+    return ret;
   }
 
   @Override
@@ -36,16 +90,37 @@ public class GameRuleListWidget extends EntryListWidget<GameRuleListEntryWidget>
     return super.getEntryWidth();
   }
 
-  public void filter(final Supplier<String> filter, final boolean load) {
+  public void filter(final Supplier<String> filter) {
     this.clearEntries();
-    TreeMap<String, GameRules.Key> gamerules = GameRules.getKeys();
-    if (gamerules != null) {
-      final String term = filter.get().toLowerCase(Locale.ROOT);
-      gamerules.entrySet().stream()
-          .filter(entry -> term.isEmpty() || entry.getKey().toLowerCase(Locale.ROOT).contains(term))
-          .forEach(entry -> addEntry(
-              new GameRuleListEntryWidget(entry.getKey(), entry.getValue(), client, this)));
+    String text = filter.get();
+    Matcher matcher = SEARCH_PATTERN.matcher((text == null ? "" : text).trim());
+    final String mod;
+    final String term;
+    if (matcher.matches()) {
+      mod = matcher.group(2);
+      term = matcher.group(5);
+    } else {
+      mod = "";
+      term = "";
     }
+
+    this.gamerules.entrySet().stream()
+        .filter(e -> !e.getValue().isEmpty() && termMatches(mod, e.getKey().replaceAll("\\s", "")))
+        .forEach(e -> {
+          List<GameRuleEntry> toAdd = new ArrayList<>();
+          e.getValue().stream().filter(rule -> termMatches(term, rule.ruleName))
+              .forEachOrdered(toAdd::add);
+          if (!toAdd.isEmpty()) {
+            addEntry(new CategoryEntry(e.getKey()));
+            toAdd.forEach(this::addEntry);
+          }
+        });
+  }
+
+  private static boolean termMatches(String term, String toMatch) {
+    if (term == null || term.isEmpty())
+      return true;
+    return toMatch.toLowerCase().contains(term.toLowerCase());
   }
 
   @Override
@@ -55,21 +130,36 @@ public class GameRuleListWidget extends EntryListWidget<GameRuleListEntryWidget>
 
   @Override
   protected boolean isFocused() {
-    return this.parent.getFocused() == this;
+    return this.gui.getFocused() == this;
   }
 
-  public void setSelected(int index) {
+  public Optional<Entry> setSelected(int index) {
+    Optional<Entry> previous = this.getSelected();
+    if (previous.isPresent()) {
+      Entry previousEntry = previous.get();
+      if (previousEntry instanceof GameRuleEntry) {
+        ((GameRuleEntry) previousEntry).editField.setFocused(false);
+      }
+    }
     this.selectedId = index;
-    this.parent.enableButtons(this.getSelected().isPresent());
+    Optional<Entry> current = this.getSelected();
+    if (current.isPresent()) {
+      Entry currentEntry = current.get();
+      if (currentEntry instanceof GameRuleEntry) {
+        ((GameRuleEntry) currentEntry).editField.setFocused(true);
+      }
+    }
+    return current;
+    //this.gui.enableButtons(this.getSelected().isPresent());
   }
 
   @Override
   protected void moveSelection(int index) {
-    this.selectedId = MathHelper.clamp(this.selectedId + index, 0, this.getEntryCount() - 1);
-    Optional<GameRuleListEntryWidget> selected = this.getSelected();
+    Optional<Entry> selected =
+        setSelected(MathHelper.clamp(this.selectedId + index, 0, this.getEntryCount() - 1));
     //scrolls to 'selected'
     selected.ifPresent(this::method_19349);
-    this.parent.enableButtons(selected.isPresent());
+    //this.gui.enableButtons(selected.isPresent());
   }
 
   @Override
@@ -82,20 +172,104 @@ public class GameRuleListWidget extends EntryListWidget<GameRuleListEntryWidget>
     return index == this.selectedId;
   }
 
-  public Optional<GameRuleListEntryWidget> getSelected() {
+  public Optional<Entry> getSelected() {
     return (this.selectedId < 0 || this.selectedId >= this.getEntryCount()) ? Optional.empty()
         : Optional.of(this.getInputListeners().get(this.selectedId));
   }
 
   public EditGameRulesScreen getParent() {
-    return this.parent;
+    return this.gui;
   }
 
   @Override
   public void onFocusChanged(boolean hasFocus) {
-    if (hasFocus && !this.getSelected().isPresent() && this.getEntryCount() > 0) {
-      this.selectedId = 0;
-      this.parent.enableButtons(false);
+    if (hasFocus && !this.getSelected().isPresent() && this.getEntryCount() > 0)
+      setSelected(0);
+  }
+
+  public abstract static class Entry extends EntryListWidget.Entry<Entry> {
+  }
+
+  public class CategoryEntry extends Entry implements Comparable<CategoryEntry> {
+    private final String name;
+    private final int nameWidth;
+
+    public CategoryEntry(String name) {
+      this.name = name;
+      this.nameWidth = GameRuleListWidget.this.client.textRenderer.getStringWidth(this.name);
+    }
+
+    @Override
+    public void draw(int width, int integer3, int integer4, int integer5, boolean selected,
+        float partial) {
+      TextRenderer n = GameRuleListWidget.this.client.textRenderer;
+      String d = this.name;
+      float arg7 = (float) (GameRuleListWidget.this.client.currentScreen.screenWidth / 2
+          - this.nameWidth / 2);
+      int n2 = this.getY() + integer3;
+      GameRuleListWidget.this.client.textRenderer.getClass();
+      n.draw(d, arg7, (float) (n2 - 9 - 1), 16777215);
+    }
+
+    @Override
+    public int compareTo(CategoryEntry other) {
+      return this.name.compareTo(other.name);
+    }
+  }
+
+  public class GameRuleEntry extends Entry implements Comparable<GameRuleEntry> {
+    private final String ruleName;
+    private final GameRulesKeyHook ruleKey;
+    private final GameRules.Value ruleValue;
+
+    private final TextFieldWidget editField;
+    private final ButtonWidget resetButton;
+
+    private GameRuleEntry(String ruleName, GameRules.Key ruleKey, GameRules.Value ruleValue) {
+      this.ruleName = ruleName;
+      this.ruleKey = ((GameRulesKeyHook) ruleKey);
+      this.ruleValue = ruleValue;
+      this.editField =
+          new TextFieldWidget(GameRuleListWidget.this.client.textRenderer, 0, 0, 75, 16);
+      this.editField.setText(this.ruleKey.getDefaultValue());
+      this.resetButton = new ButtonWidget(0, 0, 50, 20, Util.translate("controls.reset", "Reset"),
+          buttonWidget -> {
+            this.ruleValue.set(this.ruleKey.getDefaultValue(), null);
+          });
+    }
+
+    @Override
+    public void draw(int width, int integer3, int integer4, int integer5, boolean selected,
+        float partial) {
+      int x = this.getX();
+      int y = this.getY();
+      int n2 = y + integer3 / 2;
+      GameRuleListWidget.this.client.textRenderer.draw(this.ruleName,
+          x + 90 - GameRuleListWidget.this.maxStringWidth, n2 - 9 / 2, 0xFFFFFF);
+      this.resetButton.x = x + 190;
+      this.resetButton.y = y - 2;
+      this.resetButton.active = this.editField.getText().equals(this.ruleValue.getString());
+      this.resetButton.render(integer4, integer5, partial);
+      ((TextFieldPosAccessor) this.editField).cg$setXPos(x + 105);
+      ((TextFieldPosAccessor) this.editField).cg$setYPos(y);
+      this.editField.render(integer4, integer5, partial);
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+      return this.editField.mouseClicked(mouseX, mouseY, button)
+          || this.resetButton.mouseClicked(mouseX, mouseY, button);
+    }
+
+    @Override
+    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+      return this.editField.mouseReleased(mouseX, mouseY, button)
+          || this.resetButton.mouseReleased(mouseX, mouseY, button);
+    }
+
+    @Override
+    public int compareTo(GameRuleEntry other) {
+      return this.ruleName.compareTo(other.ruleName);
     }
   }
 }

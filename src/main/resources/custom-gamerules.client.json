@@ -1,9 +1,11 @@
 {
   "required": true,
-  "package": "com.misterpemodder.customgamerules.mixin",
+  "package": "com.misterpemodder.customgamerules.mixin.client",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "BackupLevelScreenMixin"
+    "BackupLevelScreenMixin",
+    "ScreenMixin",
+    "TextFieldPosAccessor"
   ],
   "injectors": {
     "defaultRequire": 1
