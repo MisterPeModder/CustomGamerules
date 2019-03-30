@@ -17,10 +17,9 @@ public abstract class BackupLevelScreenMixin extends Screen {
     super(name);
   }
 
-  @Inject(at = @At("TAIL"), method = "onInitialized()V")
+  @Inject(at = @At("TAIL"), method = "init()V")
   protected void onOnInitialized(CallbackInfo ci) {
-    this.addButton(
-        new EditGameRulesButton(this.screenWidth / 2 - 100, this.screenHeight / 4 + 144 + 5, 200,
-            20, Util.translate("customgamerules.edit", "Edit Gamerules"), this));
+    addButton(new EditGameRulesButton(this.width / 2 - 100, this.height / 4 + 144 + 5, 200, 20,
+        Util.translate("customgamerules.edit", "Edit Gamerules"), this));
   }
 }

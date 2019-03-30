@@ -12,9 +12,8 @@ public class EditGameRulesButton extends ButtonWidget {
         .openScreen(new EditGameRulesScreen(new GameRules(), parent)));
   }
 
-  public static void changeButtonHeight(Screen screen, int screenHeight,
-      AbstractButtonWidget button) {
-    if (button.y >= screenHeight / 4 + 144 + 5 && !(button instanceof EditGameRulesButton))
+  public static void changeButtonHeight(Screen screen, int height, AbstractButtonWidget button) {
+    if (button.y >= height / 4 + 144 + 5 && !(button instanceof EditGameRulesButton))
       button.y += 24;
     button.y -= 12;
   }

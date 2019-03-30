@@ -20,12 +20,12 @@ import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.EntryListWidget;
+import net.minecraft.client.gui.widget.ItemListWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.GameRules;
 
-public class GameRuleListWidget extends EntryListWidget<GameRuleListWidget.Entry> {
+public class GameRuleListWidget extends ItemListWidget<GameRuleListWidget.Entry> {
   private EditGameRulesScreen gui;
   private int selectedId;
   private int maxStringWidth;
@@ -40,7 +40,6 @@ public class GameRuleListWidget extends EntryListWidget<GameRuleListWidget.Entry
     this.gamerules = getGamerules();
     this.selectedId = -1;
     filter(filter);
-
     this.maxStringWidth = 0;
     for (Set<GameRuleEntry> rules : this.gamerules.values())
       for (GameRuleEntry rule : rules)
@@ -80,18 +79,8 @@ public class GameRuleListWidget extends EntryListWidget<GameRuleListWidget.Entry
     super.render(mouseX, mouseY, delta);
   }
 
-  @Override
-  public int getEntryHeight() {
-    return super.getEntryHeight();
-  }
-
-  @Override
-  public int getEntryWidth() {
-    return super.getEntryWidth();
-  }
-
   public void filter(final Supplier<String> filter) {
-    this.clearEntries();
+    this.clearItems();
     String text = filter.get();
     Matcher matcher = SEARCH_PATTERN.matcher((text == null ? "" : text).trim());
     final String mod;
@@ -111,8 +100,8 @@ public class GameRuleListWidget extends EntryListWidget<GameRuleListWidget.Entry
           e.getValue().stream().filter(rule -> termMatches(term, rule.ruleName))
               .forEachOrdered(toAdd::add);
           if (!toAdd.isEmpty()) {
-            addEntry(new CategoryEntry(e.getKey()));
-            toAdd.forEach(this::addEntry);
+            addItem(new CategoryEntry(e.getKey()));
+            toAdd.forEach(this::addItem);
           }
         });
   }
@@ -153,12 +142,13 @@ public class GameRuleListWidget extends EntryListWidget<GameRuleListWidget.Entry
     //this.gui.enableButtons(this.getSelected().isPresent());
   }
 
+  // moveSelection()
   @Override
-  protected void moveSelection(int index) {
+  protected void method_20069(int index) {
     Optional<Entry> selected =
-        setSelected(MathHelper.clamp(this.selectedId + index, 0, this.getEntryCount() - 1));
+        setSelected(MathHelper.clamp(this.selectedId + index, 0, this.getItemCount() - 1));
     //scrolls to 'selected'
-    selected.ifPresent(this::method_19349);
+    selected.ifPresent(this::method_20072);
     //this.gui.enableButtons(selected.isPresent());
   }
 
@@ -168,13 +158,13 @@ public class GameRuleListWidget extends EntryListWidget<GameRuleListWidget.Entry
   }
 
   @Override
-  protected boolean isSelectedEntry(int index) {
+  protected boolean isSelected(int index) {
     return index == this.selectedId;
   }
 
   public Optional<Entry> getSelected() {
-    return (this.selectedId < 0 || this.selectedId >= this.getEntryCount()) ? Optional.empty()
-        : Optional.of(this.getInputListeners().get(this.selectedId));
+    return (this.selectedId < 0 || this.selectedId >= this.getItemCount()) ? Optional.empty()
+        : Optional.of(this.children().get(this.selectedId));
   }
 
   public EditGameRulesScreen getParent() {
@@ -182,12 +172,12 @@ public class GameRuleListWidget extends EntryListWidget<GameRuleListWidget.Entry
   }
 
   @Override
-  public void onFocusChanged(boolean hasFocus) {
-    if (hasFocus && !this.getSelected().isPresent() && this.getEntryCount() > 0)
+  public void onFocusChanged(boolean boolean_1, boolean hasFocus) {
+    if (hasFocus && !this.getSelected().isPresent() && this.getItemCount() > 0)
       setSelected(0);
   }
 
-  public abstract static class Entry extends EntryListWidget.Entry<Entry> {
+  public abstract static class Entry extends ItemListWidget.Item<Entry> {
   }
 
   public class CategoryEntry extends Entry implements Comparable<CategoryEntry> {
@@ -200,15 +190,12 @@ public class GameRuleListWidget extends EntryListWidget<GameRuleListWidget.Entry
     }
 
     @Override
-    public void draw(int width, int integer3, int integer4, int integer5, boolean selected,
-        float partial) {
-      TextRenderer n = GameRuleListWidget.this.client.textRenderer;
-      String d = this.name;
-      float arg7 = (float) (GameRuleListWidget.this.client.currentScreen.screenWidth / 2
-          - this.nameWidth / 2);
-      int n2 = this.getY() + integer3;
-      GameRuleListWidget.this.client.textRenderer.getClass();
-      n.draw(d, arg7, (float) (n2 - 9 - 1), 16777215);
+    public void render(int listX, int listY, int width, int height, int x, int y, int integer_7,
+        boolean selected, float partial) {
+      TextRenderer textRenderer = GameRuleListWidget.this.client.textRenderer;
+      float str =
+          (float) (GameRuleListWidget.this.client.currentScreen.width / 2 - this.nameWidth / 2);
+      textRenderer.draw(this.name, str, x + listY - 10, 0xFFFFFF);
     }
 
     @Override
@@ -239,20 +226,18 @@ public class GameRuleListWidget extends EntryListWidget<GameRuleListWidget.Entry
     }
 
     @Override
-    public void draw(int width, int integer3, int integer4, int integer5, boolean selected,
-        float partial) {
-      int x = this.getX();
-      int y = this.getY();
-      int n2 = y + integer3 / 2;
+    public void render(int listX, int listY, int width, int height, int x, int y, int integer_7,
+        boolean selected, float partial) {
+      int n2 = listY + x / 2;
       GameRuleListWidget.this.client.textRenderer.draw(this.ruleName,
-          x + 90 - GameRuleListWidget.this.maxStringWidth, n2 - 9 / 2, 0xFFFFFF);
-      this.resetButton.x = x + 190;
-      this.resetButton.y = y - 2;
+          width + 90 - GameRuleListWidget.this.maxStringWidth, n2 - 9 / 2, 0xFFFFFF);
+      this.resetButton.x = width + 190;
+      this.resetButton.y = listY - 2;
       this.resetButton.active = this.editField.getText().equals(this.ruleValue.getString());
-      this.resetButton.render(integer4, integer5, partial);
-      ((TextFieldPosAccessor) this.editField).cg$setXPos(x + 105);
-      ((TextFieldPosAccessor) this.editField).cg$setYPos(y);
-      this.editField.render(integer4, integer5, partial);
+      this.resetButton.render(y, integer_7, partial);
+      ((TextFieldPosAccessor) this.editField).cg$setXPos(width + 105);
+      ((TextFieldPosAccessor) this.editField).cg$setYPos(listY);
+      this.editField.render(y, integer_7, partial);
     }
 
     @Override

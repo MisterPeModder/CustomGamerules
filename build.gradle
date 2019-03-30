@@ -24,8 +24,8 @@ repositories {
 dependencies {
 	minecraft "com.mojang:minecraft:$mcVersion"
 	mappings "net.fabricmc:yarn:$mcVersion.$mcMappings"
-	modCompile "net.fabricmc:fabric-loader:0.3.7.109"
-	modCompile "net.fabricmc:fabric:0.2.5.114"
+	modCompile "net.fabricmc:fabric-loader:$fabricLoaderVersion"
+	modCompile "net.fabricmc:fabric:$fabricApiVersion"
 
 	// Dev mode
 	// modCompile "com.jamieswhiteshirt:developer-mode:1.0.3"

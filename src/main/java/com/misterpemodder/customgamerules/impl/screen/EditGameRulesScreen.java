@@ -2,7 +2,7 @@ package com.misterpemodder.customgamerules.impl.screen;
 
 import com.misterpemodder.customgamerules.impl.Util;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.InputListener;
+import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
@@ -28,50 +28,47 @@ public class EditGameRulesScreen extends Screen {
   }
 
   @Override
-  public void update() {
+  public void tick() {
     this.searchBox.tick();
   }
 
   @Override
-  protected void onInitialized() {
-
-    this.client.keyboard.enableRepeatEvents(true);
-    this.saveButton = addButton(new ButtonWidget(this.screenWidth / 2 - 154, this.screenHeight - 28,
-        150, 20, Util.translate("selectWorld.edit.save", "Save"),
-        b -> this.client.openScreen(this.parent)));
-    this.cancelButton = addButton(new ButtonWidget(this.screenWidth / 2 + 4, this.screenHeight - 28,
-        150, 20, Util.translate("gui.cancel", "Cancel"), b -> this.client.openScreen(this.parent)));
-    (this.searchBox =
-        new TextFieldWidget(this.fontRenderer, this.screenWidth / 2 - 100, 22, 200, 20) {
-          @Override
-          public void setFocused(boolean focused) {
-            super.setFocused(focused);
-          }
-        }).setChangedListener(text -> {
-          this.gameRuleList.filter(() -> text);
-          this.searchBox
-              .method_1868(this.gameRuleList.getInputListeners().isEmpty() ? 0xff5555 : 0xe0e0e0);
-        });
-    this.gameRuleList = new GameRuleListWidget(this, this.client, this.screenWidth,
-        this.screenHeight, 48, this.screenHeight - 36, 22, () -> this.searchBox.getText());
-    this.gameRuleList.setRenderSelection(false);
+  protected void init() {
+    this.minecraft.keyboard.enableRepeatEvents(true);
+    this.saveButton = addButton(new ButtonWidget(this.width / 2 - 154, this.height - 28, 150, 20,
+        Util.translate("selectWorld.edit.save", "Save"),
+        b -> this.minecraft.openScreen(this.parent)));
+    this.cancelButton = addButton(new ButtonWidget(this.width / 2 + 4, this.height - 28, 150, 20,
+        Util.translate("gui.cancel", "Cancel"), b -> this.minecraft.openScreen(this.parent)));
+    (this.searchBox = new TextFieldWidget(this.font, this.width / 2 - 100, 22, 200, 20) {
+      @Override
+      public void setFocused(boolean focused) {
+        super.setFocused(focused);
+      }
+    }).setChangedListener(text -> {
+      this.gameRuleList.filter(() -> text);
+      this.searchBox.method_1868(this.gameRuleList.children().isEmpty() ? 0xff5555 : 0xe0e0e0);
+    });
+    this.gameRuleList = new GameRuleListWidget(this, this.minecraft, this.width, this.height, 48,
+        this.height - 36, 22, () -> this.searchBox.getText());
+    //this.gameRuleList.setRenderSelection(false);
     this.searchBox.setFocused(true);
-    this.listeners.add(this.searchBox);
-    this.listeners.add(this.gameRuleList);
-    focusOn(this.searchBox);
+    this.children.add(this.searchBox);
+    this.children.add(this.gameRuleList);
+    setFocused(this.searchBox);
     enableButtons(true);
   }
 
   @Override
-  public void onScaleChanged(MinecraftClient client, int screenWidth, int screenHeight) {
+  public void resize(MinecraftClient client, int width, int height) {
     String text = this.searchBox.getText();
-    this.initialize(client, screenWidth, screenHeight);
+    this.init(client, width, height);
     this.searchBox.setText(text);
   }
 
   @Override
-  public void onClosed() {
-    this.client.keyboard.enableRepeatEvents(false);
+  public void onClose() {
+    this.minecraft.keyboard.enableRepeatEvents(false);
   }
 
   @Override
@@ -83,10 +80,10 @@ public class EditGameRulesScreen extends Screen {
 
   @Override
   public void render(final int mouseX, final int mouseY, final float delta) {
-    drawBackground();
+    renderBackground();
     this.gameRuleList.render(mouseX, mouseY, delta);
-    this.drawString(this.fontRenderer, Util.translate("customgamerules.search", "Search"),
-        this.screenWidth / 2 - 100, 9, 0xa0a0a0);
+    this.drawString(this.font, Util.translate("customgamerules.search", "Search"),
+        this.width / 2 - 100, 9, 0xa0a0a0);
     this.searchBox.render(mouseX, mouseY, delta);
     super.render(mouseX, mouseY, delta);
     // TODO Handle tooltips
@@ -103,25 +100,9 @@ public class EditGameRulesScreen extends Screen {
     }*/
   }
 
-  @Override
-  public void focusNext() {
-    /*if (true) {
-      List<GameRuleListEntryWidget> entries = this.gameRuleList.getInputListeners();
-      int id = entries.indexOf(this.gameRuleList.selected) + 1;
-      if (id < entries.size()) {
-        this.gameRuleList.selected = entries.get(id);
-      }
-    }*/
-    super.focusNext();
-  }
 
   @Override
-  public void focusPrevious() {
-    super.focusPrevious();
-  }
-
-  @Override
-  public void setFocused(InputListener inputListener) {
+  public void setFocused(Element inputListener) {
     this.searchBox.setFocused(inputListener == this.searchBox);
     super.setFocused(inputListener);
   }

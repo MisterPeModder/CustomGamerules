@@ -14,11 +14,11 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 @Mixin(Screen.class)
 public class ScreenMixin {
   @Shadow
-  public int screenHeight;
+  public int height;
 
-  @Inject(at = @At("HEAD"), method = "addButton", remap = false)
+  @Inject(at = @At("HEAD"), method = "addButton")
   protected void onAddButton(AbstractButtonWidget button, CallbackInfoReturnable<ButtonWidget> ci) {
     if (((Object) this) instanceof BackupLevelScreen)
-      EditGameRulesButton.changeButtonHeight((Screen) (Object) this, this.screenHeight, button);
+      EditGameRulesButton.changeButtonHeight((Screen) (Object) this, this.height, button);
   }
 }
