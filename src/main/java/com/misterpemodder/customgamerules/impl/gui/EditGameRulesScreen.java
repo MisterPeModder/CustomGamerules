@@ -1,6 +1,7 @@
-package com.misterpemodder.customgamerules.impl.screen;
+package com.misterpemodder.customgamerules.impl.gui;
 
 import com.misterpemodder.customgamerules.impl.Util;
+import com.misterpemodder.customgamerules.impl.gui.widget.GameRuleListWidget;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.Screen;
@@ -9,9 +10,6 @@ import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.text.TranslatableTextComponent;
 import net.minecraft.world.GameRules;
 
-/**
- * WIP
- */
 public class EditGameRulesScreen extends Screen {
   public final Screen parent;
   private TextFieldWidget searchBox;
@@ -30,6 +28,7 @@ public class EditGameRulesScreen extends Screen {
   @Override
   public void tick() {
     this.searchBox.tick();
+    this.gameRuleList.tick();
   }
 
   @Override
@@ -40,18 +39,15 @@ public class EditGameRulesScreen extends Screen {
         b -> this.minecraft.openScreen(this.parent)));
     this.cancelButton = addButton(new ButtonWidget(this.width / 2 + 4, this.height - 28, 150, 20,
         Util.translate("gui.cancel", "Cancel"), b -> this.minecraft.openScreen(this.parent)));
-    (this.searchBox = new TextFieldWidget(this.font, this.width / 2 - 100, 22, 200, 20) {
-      @Override
-      public void setFocused(boolean focused) {
-        super.setFocused(focused);
-      }
-    }).setChangedListener(text -> {
-      this.gameRuleList.filter(() -> text);
-      this.searchBox.method_1868(this.gameRuleList.children().isEmpty() ? 0xff5555 : 0xe0e0e0);
-    });
+    (this.searchBox = new TextFieldWidget(this.font, this.width / 2 - 100, 22, 200, 20))
+        .setChangedListener(text -> {
+          if (this.gameRuleList.filter(() -> text))
+            this.gameRuleList.capYPosition(0.0);
+          this.searchBox.method_1868(this.gameRuleList.children().isEmpty() ? 0xff5555 : 0xe0e0e0);
+        });
     this.gameRuleList = new GameRuleListWidget(this, this.minecraft, this.width, this.height, 48,
         this.height - 36, 22, () -> this.searchBox.getText());
-    //this.gameRuleList.setRenderSelection(false);
+    this.gameRuleList.setRenderSelection(false);
     this.searchBox.setFocused(true);
     this.children.add(this.searchBox);
     this.children.add(this.gameRuleList);
@@ -72,13 +68,6 @@ public class EditGameRulesScreen extends Screen {
   }
 
   @Override
-  public boolean charTyped(final char chr, final int keyCode) {
-    if (getFocused() == this.searchBox)
-      return this.searchBox.charTyped(chr, keyCode);
-    return super.charTyped(chr, keyCode);
-  }
-
-  @Override
   public void render(final int mouseX, final int mouseY, final float delta) {
     renderBackground();
     this.gameRuleList.render(mouseX, mouseY, delta);
@@ -86,20 +75,7 @@ public class EditGameRulesScreen extends Screen {
         this.width / 2 - 100, 9, 0xa0a0a0);
     this.searchBox.render(mouseX, mouseY, delta);
     super.render(mouseX, mouseY, delta);
-    // TODO Handle tooltips
-    /*
-    for (GameRuleListWidget.Entry entry : this.gameRuleList.getInputListeners()) {
-      int x = entry.getX();
-      int y = entry.getY();
-      if (mouseX >= x && mouseY >= y && mouseX < x + this.gameRuleList.getEntryWidth()
-          && mouseY < y + this.gameRuleList.getEntryHeight()) {
-        drawTooltip(entry.getTooltip(), mouseX, mouseY);
-        new ButtonWidget(0, 0, 0, 0, "yeet", w -> {
-        });
-      }
-    }*/
   }
-
 
   @Override
   public void setFocused(Element inputListener) {
