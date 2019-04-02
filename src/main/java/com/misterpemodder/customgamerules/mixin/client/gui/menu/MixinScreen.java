@@ -1,4 +1,4 @@
-package com.misterpemodder.customgamerules.mixin.client;
+package com.misterpemodder.customgamerules.mixin.client.gui.menu;
 
 import com.misterpemodder.customgamerules.impl.gui.EditGameRulesButton;
 import org.spongepowered.asm.mixin.Mixin;
@@ -12,7 +12,7 @@ import net.minecraft.client.gui.widget.AbstractButtonWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
 
 @Mixin(Screen.class)
-public class ScreenMixin {
+public class MixinScreen {
   @Shadow
   public int height;
 

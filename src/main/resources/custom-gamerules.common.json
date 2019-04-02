@@ -3,9 +3,9 @@
   "package": "com.misterpemodder.customgamerules.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "GameRulesKeyMixin",
-    "GameRuleCommandMixin",
-    "MinecraftServerMixin"
+    "server.command.MixinGameRuleCommand",
+    "server.MixinMinecraftServer",
+    "world.MixinGameRulesKey"
   ],
   "injectors": {
     "defaultRequire": 1

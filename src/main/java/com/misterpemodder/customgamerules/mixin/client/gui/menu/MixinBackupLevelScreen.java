@@ -1,4 +1,4 @@
-package com.misterpemodder.customgamerules.mixin.client;
+package com.misterpemodder.customgamerules.mixin.client.gui.menu;
 
 import com.misterpemodder.customgamerules.impl.Util;
 import com.misterpemodder.customgamerules.impl.gui.EditGameRulesButton;
@@ -10,10 +10,9 @@ import net.minecraft.client.gui.Screen;
 import net.minecraft.client.gui.menu.BackupLevelScreen;
 import net.minecraft.text.TextComponent;
 
-
 @Mixin(BackupLevelScreen.class)
-public abstract class BackupLevelScreenMixin extends Screen {
-  protected BackupLevelScreenMixin(TextComponent name) {
+public abstract class MixinBackupLevelScreen extends Screen {
+  protected MixinBackupLevelScreen(TextComponent name) {
     super(name);
   }
 

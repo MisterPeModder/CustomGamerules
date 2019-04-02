@@ -2,7 +2,7 @@ package com.misterpemodder.customgamerules.impl.gui.widget;
 
 import java.util.List;
 import com.google.common.collect.ImmutableList;
-import com.misterpemodder.customgamerules.mixin.client.TextFieldPosAccessor;
+import com.misterpemodder.customgamerules.mixin.client.gui.widget.TextFieldPosAccessor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.widget.TextFieldWidget;

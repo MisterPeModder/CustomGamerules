@@ -1,4 +1,4 @@
-package com.misterpemodder.customgamerules.mixin;
+package com.misterpemodder.customgamerules.mixin.server;
 
 import java.util.Map;
 import com.misterpemodder.customgamerules.impl.rule.ExtendedGameRuleValue;
@@ -17,7 +17,7 @@ import net.minecraft.world.level.LevelInfo;
 import net.minecraft.world.level.LevelProperties;
 
 @Mixin(MinecraftServer.class)
-public class MinecraftServerMixin {
+public class MixinMinecraftServer {
   @Shadow
   private Map<DimensionType, ServerWorld> worlds;
 

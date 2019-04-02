@@ -1,4 +1,4 @@
-package com.misterpemodder.customgamerules.mixin;
+package com.misterpemodder.customgamerules.mixin.server.command;
 
 import com.misterpemodder.customgamerules.impl.command.DynamicGameRuleCommand;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -9,7 +9,7 @@ import net.minecraft.server.command.GameRuleCommand;
 import net.minecraft.server.command.ServerCommandSource;
 
 @Mixin(GameRuleCommand.class)
-public final class GameRuleCommandMixin {
+public final class MixinGameRuleCommand {
   @ModifyArg(
       at = @At(value = "INVOKE",
           target = "Lcom/mojang/brigadier/CommandDispatcher;register"

@@ -1,4 +1,4 @@
-package com.misterpemodder.customgamerules.mixin;
+package com.misterpemodder.customgamerules.mixin.world;
 
 import com.misterpemodder.customgamerules.impl.hook.GameRulesKeyHook;
 import org.spongepowered.asm.mixin.Mixin;
@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.Unique;
 import net.minecraft.world.GameRules;
 
 @Mixin(GameRules.Key.class)
-public final class GameRulesKeyMixin implements GameRulesKeyHook {
+public final class MixinGameRulesKey implements GameRulesKeyHook {
   @Shadow
   private String defaultValue;
   @Shadow
