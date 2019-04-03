@@ -12,7 +12,8 @@ import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import com.misterpemodder.customgamerules.impl.Util;
+import com.misterpemodder.customgamerules.impl.GameRuleRegistryImpl;
+import com.misterpemodder.customgamerules.impl.StringUtil;
 import com.misterpemodder.customgamerules.impl.gui.EditGameRulesScreen;
 import com.misterpemodder.customgamerules.impl.hook.GameRulesKeyHook;
 import net.fabricmc.loader.api.FabricLoader;
@@ -55,12 +56,13 @@ public class GameRuleListWidget extends ItemListWidget<GameRuleListWidget.ListIt
         FabricLoader.getInstance().getAllMods().stream().map(m -> m.getMetadata())
             .collect(Collectors.toMap(ModMetadata::getId, ModMetadata::getName));
     modIdToName.put("minecraft", "Minecraft");
+    modIdToName.put(GameRuleRegistryImpl.UNKOWN_MOD_ID, StringUtil
+        .translate(GameRuleRegistryImpl.UNKOWN_MOD_KEY, GameRuleRegistryImpl.UNKOWN_MOD_NAME));
     Map<String, Set<GameRuleListItem>> ret = new TreeMap<>();
     for (Map.Entry<String, GameRules.Key> rule : rules.entrySet()) {
       GameRules.Key key = rule.getValue();
-      String modId = ((GameRulesKeyHook) key).getModId();
-      if (modId == null || modId.isEmpty())
-        modId = Util.translate("customgamerules.mod.unknown", "Unknown");
+      String modId = StringUtil.defaulted(((GameRulesKeyHook) key).getModId(), StringUtil
+          .translate(GameRuleRegistryImpl.UNKOWN_MOD_KEY, GameRuleRegistryImpl.UNKOWN_MOD_NAME));
       String modName = modIdToName.get(modId);
       if (modName == null)
         modName = modId;
@@ -119,17 +121,17 @@ public class GameRuleListWidget extends ItemListWidget<GameRuleListWidget.ListIt
     final String mod;
     final String term;
     if (matcher.matches()) {
-      mod = Util.nonNullString(matcher.group(2));
-      term = Util.nonNullString(matcher.group(5));
+      mod = StringUtil.nonNull(matcher.group(2));
+      term = StringUtil.nonNull(matcher.group(5));
     } else {
       mod = "";
       term = "";
     }
 
     this.gamerules.entrySet().stream().filter(e -> !e.getValue().isEmpty()
-        && Util.containsLowerCase(e.getKey().replaceAll("\\s", ""), mod)).forEach(e -> {
+        && StringUtil.containsLowerCase(e.getKey().replaceAll("\\s", ""), mod)).forEach(e -> {
           List<GameRuleListItem> toAdd = new ArrayList<>();
-          e.getValue().stream().filter(rule -> Util.containsLowerCase(rule.ruleName, term))
+          e.getValue().stream().filter(rule -> StringUtil.containsLowerCase(rule.ruleName, term))
               .forEachOrdered(toAdd::add);
           if (!toAdd.isEmpty()) {
             addItem(new CategoryListItem(this.client, e.getKey()));

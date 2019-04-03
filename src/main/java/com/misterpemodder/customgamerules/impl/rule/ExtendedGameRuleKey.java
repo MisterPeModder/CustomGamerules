@@ -1,11 +1,10 @@
 package com.misterpemodder.customgamerules.impl.rule;
 
-import com.misterpemodder.customgamerules.impl.hook.GameRulesKeyHook;
 import com.misterpemodder.customgamerules.api.rule.GameRuleType;
-import net.minecraft.world.GameRules;
+import com.misterpemodder.customgamerules.impl.hook.GameRulesKeyHook;
 import net.minecraft.world.GameRules.Value;
 
-public class ExtendedGameRuleKey<V> extends GameRules.Key implements GameRulesKeyHook {
+public class ExtendedGameRuleKey<V> extends BaseGameRuleKey implements GameRulesKeyHook {
   public GameRuleType<V> type;
   public final String modId;
 

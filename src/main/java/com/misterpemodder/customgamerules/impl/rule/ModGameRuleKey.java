@@ -5,7 +5,7 @@ import com.misterpemodder.customgamerules.impl.hook.GameRulesKeyHook;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.GameRules;
 
-public class ModGameRuleKey extends GameRules.Key implements GameRulesKeyHook {
+public class ModGameRuleKey extends BaseGameRuleKey implements GameRulesKeyHook {
   public final String modId;
 
   public ModGameRuleKey(String modId, String defaultValue, GameRules.Type type) {

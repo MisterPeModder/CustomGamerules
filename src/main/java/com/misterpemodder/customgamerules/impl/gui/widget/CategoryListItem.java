@@ -25,6 +25,6 @@ public class CategoryListItem extends GameRuleListWidget.ListItem
 
   @Override
   public int compareTo(CategoryListItem other) {
-    return this.name.compareTo(other.name);
+    return this.name.compareToIgnoreCase(other.name);
   }
 }

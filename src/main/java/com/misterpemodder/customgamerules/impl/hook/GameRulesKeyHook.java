@@ -1,5 +1,6 @@
 package com.misterpemodder.customgamerules.impl.hook;
 
+import com.misterpemodder.customgamerules.impl.GameRuleRegistryImpl;
 import net.minecraft.world.GameRules;
 
 /**
@@ -21,7 +22,7 @@ public interface GameRulesKeyHook {
    * @return the mod id.
    */
   default String getModId() {
-    return "minecraft";
+    return GameRuleRegistryImpl.UNKOWN_MOD_ID;
   }
 
   /**

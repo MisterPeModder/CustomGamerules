@@ -1,6 +1,6 @@
 package com.misterpemodder.customgamerules.impl.gui.widget;
 
-import com.misterpemodder.customgamerules.impl.Util;
+import com.misterpemodder.customgamerules.impl.StringUtil;
 import com.misterpemodder.customgamerules.impl.hook.GameRulesKeyHook;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -21,8 +21,8 @@ public abstract class GameRuleListItem extends GameRuleListWidget.ListItem
     this.ruleName = ruleName;
     this.ruleKey = ((GameRulesKeyHook) ruleKey);
     this.ruleValue = ruleValue;
-    this.resetButton =
-        new ButtonWidget(0, 0, 50, 20, Util.translate("controls.reset", "Reset"), b -> onReset());
+    this.resetButton = new ButtonWidget(0, 0, 50, 20,
+        StringUtil.translate("controls.reset", "Reset"), b -> onReset());
   }
 
   public void setMaxStringWidth(int maxStringWidth) {

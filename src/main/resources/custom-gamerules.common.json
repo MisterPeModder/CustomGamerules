@@ -5,6 +5,7 @@
   "mixins": [
     "server.command.MixinGameRuleCommand",
     "server.MixinMinecraftServer",
+    "world.MixinGameRules",
     "world.MixinGameRulesKey"
   ],
   "injectors": {

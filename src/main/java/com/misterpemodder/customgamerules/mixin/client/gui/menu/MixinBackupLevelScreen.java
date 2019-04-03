@@ -1,6 +1,6 @@
 package com.misterpemodder.customgamerules.mixin.client.gui.menu;
 
-import com.misterpemodder.customgamerules.impl.Util;
+import com.misterpemodder.customgamerules.impl.StringUtil;
 import com.misterpemodder.customgamerules.impl.gui.EditGameRulesButton;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -19,6 +19,6 @@ public abstract class MixinBackupLevelScreen extends Screen {
   @Inject(at = @At("TAIL"), method = "init()V")
   protected void onOnInitialized(CallbackInfo ci) {
     addButton(new EditGameRulesButton(this.width / 2 - 100, this.height / 4 + 144 + 5, 200, 20,
-        Util.translate("customgamerules.edit", "Edit Gamerules"), this));
+        StringUtil.translate("customgamerules.edit", "Edit Gamerules"), this));
   }
 }

@@ -1,6 +1,6 @@
 package com.misterpemodder.customgamerules.impl.gui;
 
-import com.misterpemodder.customgamerules.impl.Util;
+import com.misterpemodder.customgamerules.impl.StringUtil;
 import com.misterpemodder.customgamerules.impl.gui.widget.GameRuleListWidget;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
@@ -35,10 +35,10 @@ public class EditGameRulesScreen extends Screen {
   protected void init() {
     this.minecraft.keyboard.enableRepeatEvents(true);
     this.saveButton = addButton(new ButtonWidget(this.width / 2 - 154, this.height - 28, 150, 20,
-        Util.translate("selectWorld.edit.save", "Save"),
+        StringUtil.translate("selectWorld.edit.save", "Save"),
         b -> this.minecraft.openScreen(this.parent)));
     this.cancelButton = addButton(new ButtonWidget(this.width / 2 + 4, this.height - 28, 150, 20,
-        Util.translate("gui.cancel", "Cancel"), b -> this.minecraft.openScreen(this.parent)));
+        StringUtil.translate("gui.cancel", "Cancel"), b -> this.minecraft.openScreen(this.parent)));
     (this.searchBox = new TextFieldWidget(this.font, this.width / 2 - 100, 22, 200, 20))
         .setChangedListener(text -> {
           if (this.gameRuleList.filter(() -> text))
@@ -71,7 +71,7 @@ public class EditGameRulesScreen extends Screen {
   public void render(final int mouseX, final int mouseY, final float delta) {
     renderBackground();
     this.gameRuleList.render(mouseX, mouseY, delta);
-    this.drawString(this.font, Util.translate("customgamerules.search", "Search"),
+    this.drawString(this.font, StringUtil.translate("customgamerules.search", "Search"),
         this.width / 2 - 100, 9, 0xa0a0a0);
     this.searchBox.render(mouseX, mouseY, delta);
     super.render(mouseX, mouseY, delta);
