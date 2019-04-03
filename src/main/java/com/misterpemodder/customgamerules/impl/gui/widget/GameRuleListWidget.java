@@ -175,16 +175,23 @@ public class GameRuleListWidget extends ItemListWidget<GameRuleListWidget.ListIt
   @Override
   public boolean mouseClicked(double double_1, double double_2, int int_1) {
     for (ListItem item : children())
-      if (item.mouseClicked(double_1, double_2, int_1))
+      if (item.mouseClicked(double_1, double_2, int_1)) {
+        Optional<ListItem> current = this.getSelected();
+        int index = children().indexOf(item);
+        setFocused(item);
+        if (current.isPresent() && index >= 0 && index < this.getItemCount()) {
+          method_20069(index - children().indexOf(current.get()));
+        }
         return true;
+      }
     return super.mouseClicked(double_1, double_2, int_1);
   }
 
   // moveSelection()
   @Override
-  protected void method_20069(int index) {
+  protected void method_20069(int distance) {
     Optional<ListItem> selected =
-        setSelected(MathHelper.clamp(this.selectedId + index, 0, this.getItemCount() - 1));
+        setSelected(MathHelper.clamp(this.selectedId + distance, 0, this.getItemCount() - 1));
     //scrolls to 'selected'
     selected.ifPresent(this::method_20072);
   }
@@ -205,8 +212,8 @@ public class GameRuleListWidget extends ItemListWidget<GameRuleListWidget.ListIt
 
   @Override
   public void onFocusChanged(boolean boolean_1, boolean hasFocus) {
-    if (hasFocus && !this.getSelected().isPresent() && this.getItemCount() > 0)
-      setSelected(0);
+    if (hasFocus && !this.getSelected().isPresent() && this.getItemCount() > 1)
+      setSelected(1);
   }
 
   public abstract static class ListItem extends ItemListWidget.Item<ListItem> {

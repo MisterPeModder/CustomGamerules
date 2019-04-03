@@ -3,6 +3,7 @@ package com.misterpemodder.customgamerules.impl.gui.widget;
 import java.util.List;
 import com.google.common.collect.ImmutableList;
 import com.misterpemodder.customgamerules.mixin.client.gui.widget.TextFieldPosAccessor;
+import org.lwjgl.glfw.GLFW;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.widget.TextFieldWidget;
@@ -10,6 +11,7 @@ import net.minecraft.world.GameRules;
 
 public class FieldGameRuleListItem extends GameRuleListItem {
   private final TextFieldWidget editField;
+  private Element focusedElement = null;
 
   public FieldGameRuleListItem(MinecraftClient client, String ruleName, GameRules.Key ruleKey,
       GameRules.Value ruleValue) {
@@ -21,6 +23,12 @@ public class FieldGameRuleListItem extends GameRuleListItem {
   @Override
   public void setFocused(boolean focused) {
     this.editField.setFocused(focused);
+    this.focusedElement = focused ? this.editField : null;
+  }
+
+  @Override
+  protected Element getFocusedElement() {
+    return this.focusedElement;
   }
 
   @Override
@@ -30,7 +38,25 @@ public class FieldGameRuleListItem extends GameRuleListItem {
 
   @Override
   public boolean keyPressed(int keyCode, int int_2, int int_3) {
-    return this.editField.keyPressed(keyCode, int_2, int_3);
+    if (this.focusedElement == this.resetButton && keyCode == GLFW.GLFW_KEY_ENTER) {
+      this.resetButton.onPress();
+      this.resetButton.playDownSound(this.client.getSoundManager());
+      this.focusedElement = this.editField;
+      this.editField.setFocused(true);
+      return true;
+    } else if (keyCode == GLFW.GLFW_KEY_LEFT && this.focusedElement != this.editField) {
+      this.focusedElement = editField;
+      this.editField.setFocused(true);
+      return true;
+    } else if (keyCode == GLFW.GLFW_KEY_RIGHT
+        && this.editField.getCursor() >= this.editField.getText().length()
+        && this.resetButton.active) {
+      this.focusedElement = this.resetButton;
+      this.editField.setFocused(false);
+      return true;
+    }
+    return super.keyPressed(keyCode, int_2, int_3)
+        || this.editField.keyPressed(keyCode, int_2, int_3);
   }
 
   @Override

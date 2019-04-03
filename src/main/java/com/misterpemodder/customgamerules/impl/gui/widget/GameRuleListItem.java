@@ -3,6 +3,7 @@ package com.misterpemodder.customgamerules.impl.gui.widget;
 import com.misterpemodder.customgamerules.impl.StringUtil;
 import com.misterpemodder.customgamerules.impl.hook.GameRulesKeyHook;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.world.GameRules;
 
@@ -22,8 +23,15 @@ public abstract class GameRuleListItem extends GameRuleListWidget.ListItem
     this.ruleKey = ((GameRulesKeyHook) ruleKey);
     this.ruleValue = ruleValue;
     this.resetButton = new ButtonWidget(0, 0, 50, 20,
-        StringUtil.translate("controls.reset", "Reset"), b -> onReset());
+        StringUtil.translate("controls.reset", "Reset"), b -> onReset()) {
+      @Override
+      public boolean isHovered() {
+        return GameRuleListItem.this.getFocusedElement() == this;
+      }
+    };
   }
+
+  protected abstract Element getFocusedElement();
 
   public void setMaxStringWidth(int maxStringWidth) {
     this.maxStringWidth = maxStringWidth;

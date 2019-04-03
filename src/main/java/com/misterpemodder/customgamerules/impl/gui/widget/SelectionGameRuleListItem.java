@@ -2,6 +2,7 @@ package com.misterpemodder.customgamerules.impl.gui.widget;
 
 import java.util.List;
 import com.google.common.collect.ImmutableList;
+import org.lwjgl.glfw.GLFW;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -13,6 +14,7 @@ public class SelectionGameRuleListItem extends GameRuleListItem {
   private final String[] values;
   private int selected;
   private final int initialIndex;
+  private ButtonWidget focusedButton = null;
 
   public SelectionGameRuleListItem(MinecraftClient client, String ruleName, GameRules.Key ruleKey,
       GameRules.Value ruleValue, String[] values, int initialIndex) {
@@ -24,7 +26,40 @@ public class SelectionGameRuleListItem extends GameRuleListItem {
       if (++this.selected >= this.values.length)
         this.selected = 0;
       b.setMessage(this.values[this.selected]);
-    });
+    }) {
+      @Override
+      public boolean isHovered() {
+        return SelectionGameRuleListItem.this.focusedButton == this;
+      }
+    };
+  }
+
+  @Override
+  public boolean keyPressed(int keyCode, int int_2, int int_3) {
+    if (keyCode == GLFW.GLFW_KEY_ENTER) {
+      if (this.focusedButton == null)
+        return super.keyPressed(keyCode, int_2, int_3);
+      this.focusedButton.onPress();
+      this.resetButton.playDownSound(this.client.getSoundManager());
+      this.focusedButton = this.selectButton;
+    } else if (keyCode == GLFW.GLFW_KEY_LEFT) {
+      this.focusedButton = this.selectButton;
+    } else if (keyCode == GLFW.GLFW_KEY_RIGHT && this.resetButton.active) {
+      this.focusedButton = this.resetButton;
+    } else {
+      return super.keyPressed(keyCode, int_2, int_3);
+    }
+    return true;
+  }
+
+  @Override
+  public void setFocused(boolean focused) {
+    this.focusedButton = focused ? this.selectButton : null;
+  }
+
+  @Override
+  protected Element getFocusedElement() {
+    return this.focusedButton;
   }
 
   @Override

@@ -13,9 +13,7 @@
     "sources": "https://github.com/MisterPeModder/CustomGamerules"
   },
   "side": "universal",
-  "initializers": [
-    "com.misterpemodder.customgamerules.impl.DummyInitializer"
-  ],
+  "initializers": [],
   "requires": {},
   "mixins": {
     "client": "custom-gamerules.client.json",
