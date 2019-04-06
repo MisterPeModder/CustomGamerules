@@ -1,23 +1,24 @@
-package com.misterpemodder.customgamerules.impl.gui.widget;
+package com.misterpemodder.customgamerules.impl.menu.widget;
 
 import java.util.List;
 import com.google.common.collect.ImmutableList;
+import com.misterpemodder.customgamerules.api.rule.key.GameRuleKey;
+import com.misterpemodder.customgamerules.api.rule.value.GameRuleValue;
 import org.lwjgl.glfw.GLFW;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.GameRules;
 
-public class SelectionGameRuleListItem extends GameRuleListItem {
+public class SelectionGameRuleListItem<V> extends GameRuleListItem<V> {
   private final ButtonWidget selectButton;
   private final String[] values;
   private int selected;
   private final int initialIndex;
   private ButtonWidget focusedButton = null;
 
-  public SelectionGameRuleListItem(MinecraftClient client, String ruleName, GameRules.Key ruleKey,
-      GameRules.Value ruleValue, String[] values, int initialIndex) {
+  public SelectionGameRuleListItem(MinecraftClient client, String ruleName, GameRuleKey<V> ruleKey,
+      GameRuleValue<V> ruleValue, String[] values, int initialIndex) {
     super(client, ruleName, ruleKey, ruleValue);
     this.selected = MathHelper.clamp(initialIndex, 0, values.length);
     this.values = values;
@@ -32,6 +33,14 @@ public class SelectionGameRuleListItem extends GameRuleListItem {
         return SelectionGameRuleListItem.this.focusedButton == this;
       }
     };
+  }
+
+  @SuppressWarnings("unchecked")
+  public static SelectionGameRuleListItem<?> create(MinecraftClient client, String ruleName,
+      GameRuleKey<?> ruleKey, GameRuleValue<?> ruleValue, String[] values, int initialIndex) {
+    return new SelectionGameRuleListItem<Object>(client, ruleName,
+        (GameRuleKey<Object>) (Object) ruleKey, (GameRuleValue<Object>) (Object) ruleValue, values,
+        initialIndex);
   }
 
   @Override
@@ -92,7 +101,7 @@ public class SelectionGameRuleListItem extends GameRuleListItem {
   }
 
   @Override
-  public int compareTo(GameRuleListItem other) {
+  public int compareTo(GameRuleListItem<V> other) {
     return this.ruleName.compareTo(other.ruleName);
   }
 

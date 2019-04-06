@@ -1,26 +1,26 @@
-package com.misterpemodder.customgamerules.impl.gui.widget;
+package com.misterpemodder.customgamerules.impl.menu.widget;
 
+import com.misterpemodder.customgamerules.api.rule.key.GameRuleKey;
+import com.misterpemodder.customgamerules.api.rule.value.GameRuleValue;
 import com.misterpemodder.customgamerules.impl.StringUtil;
-import com.misterpemodder.customgamerules.impl.hook.GameRulesKeyHook;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.world.GameRules;
 
-public abstract class GameRuleListItem extends GameRuleListWidget.ListItem
-    implements Comparable<GameRuleListItem> {
+public abstract class GameRuleListItem<V> extends GameRuleListWidget.ListItem
+    implements Comparable<GameRuleListItem<V>> {
   protected final MinecraftClient client;
   protected final String ruleName;
-  protected final GameRulesKeyHook ruleKey;
-  protected final GameRules.Value ruleValue;
+  protected final GameRuleKey<V> ruleKey;
+  protected final GameRuleValue<V> ruleValue;
   protected final ButtonWidget resetButton;
   private int maxStringWidth;
 
-  protected GameRuleListItem(MinecraftClient client, String ruleName, GameRules.Key ruleKey,
-      GameRules.Value ruleValue) {
+  protected GameRuleListItem(MinecraftClient client, String ruleName, GameRuleKey<V> ruleKey,
+      GameRuleValue<V> ruleValue) {
     this.client = client;
     this.ruleName = ruleName;
-    this.ruleKey = ((GameRulesKeyHook) ruleKey);
+    this.ruleKey = ruleKey;
     this.ruleValue = ruleValue;
     this.resetButton = new ButtonWidget(0, 0, 50, 20,
         StringUtil.translate("controls.reset", "Reset"), b -> onReset()) {

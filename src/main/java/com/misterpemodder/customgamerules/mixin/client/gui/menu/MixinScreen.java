@@ -1,6 +1,6 @@
 package com.misterpemodder.customgamerules.mixin.client.gui.menu;
 
-import com.misterpemodder.customgamerules.impl.gui.EditGameRulesButton;
+import com.misterpemodder.customgamerules.impl.menu.EditGameRulesButton;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;

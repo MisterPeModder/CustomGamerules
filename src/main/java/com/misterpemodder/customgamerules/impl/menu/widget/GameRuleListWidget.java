@@ -1,4 +1,4 @@
-package com.misterpemodder.customgamerules.impl.gui.widget;
+package com.misterpemodder.customgamerules.impl.menu.widget;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,23 +12,24 @@ import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import com.misterpemodder.customgamerules.impl.GameRuleRegistryImpl;
+import com.misterpemodder.customgamerules.api.CustomGameRules;
+import com.misterpemodder.customgamerules.api.rule.key.GameRuleKey;
+import com.misterpemodder.customgamerules.api.rule.type.GameRuleTypes;
+import com.misterpemodder.customgamerules.impl.Constants;
 import com.misterpemodder.customgamerules.impl.StringUtil;
-import com.misterpemodder.customgamerules.impl.gui.EditGameRulesScreen;
-import com.misterpemodder.customgamerules.impl.hook.GameRulesKeyHook;
+import com.misterpemodder.customgamerules.impl.menu.EditGameRulesScreen;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.widget.ItemListWidget;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.GameRules;
 
 public class GameRuleListWidget extends ItemListWidget<GameRuleListWidget.ListItem> {
   private EditGameRulesScreen gui;
   private int selectedId;
   private int maxStringWidth;
 
-  private final Map<String, Set<GameRuleListItem>> gamerules;
+  private final Map<String, Set<GameRuleListItem<?>>> gamerules;
   private static final Pattern SEARCH_PATTERN = Pattern.compile("^(@\\s*([^\\s]*))?((\\s*)(.*))?");
 
   private String previousModTerm = "";
@@ -42,42 +43,42 @@ public class GameRuleListWidget extends ItemListWidget<GameRuleListWidget.ListIt
     this.selectedId = -1;
     filter(filter);
     this.maxStringWidth = 0;
-    for (Set<GameRuleListItem> rules : this.gamerules.values())
-      for (GameRuleListItem rule : rules)
+    for (Set<GameRuleListItem<?>> rules : this.gamerules.values())
+      for (GameRuleListItem<?> rule : rules)
         this.maxStringWidth =
             Math.max(this.maxStringWidth, this.client.textRenderer.getStringWidth(rule.ruleName));
   }
 
-  private Map<String, Set<GameRuleListItem>> getGamerules() {
-    TreeMap<String, GameRules.Key> rules = GameRules.getKeys();
+  private Map<String, Set<GameRuleListItem<?>>> getGamerules() {
+    TreeMap<String, GameRuleKey<?>> rules = CustomGameRules.getKeys();
     if (rules == null)
       return new HashMap<>();
     Map<String, String> modIdToName =
         FabricLoader.getInstance().getAllMods().stream().map(m -> m.getMetadata())
             .collect(Collectors.toMap(ModMetadata::getId, ModMetadata::getName));
-    modIdToName.put("minecraft", "Minecraft");
-    modIdToName.put(GameRuleRegistryImpl.UNKOWN_MOD_ID, StringUtil
-        .translate(GameRuleRegistryImpl.UNKOWN_MOD_KEY, GameRuleRegistryImpl.UNKOWN_MOD_NAME));
-    Map<String, Set<GameRuleListItem>> ret = new TreeMap<>();
-    for (Map.Entry<String, GameRules.Key> rule : rules.entrySet()) {
-      GameRules.Key key = rule.getValue();
-      String modId = StringUtil.defaulted(((GameRulesKeyHook) key).getModId(), StringUtil
-          .translate(GameRuleRegistryImpl.UNKOWN_MOD_KEY, GameRuleRegistryImpl.UNKOWN_MOD_NAME));
+    modIdToName.put(Constants.MC_MOD_ID, Constants.MC_MOD_NAME);
+    modIdToName.put(Constants.UNKNOWN_MOD_ID,
+        StringUtil.translate(Constants.UNKNOWN_MOD_KEY, Constants.UNKNOWN_MOD_NAME));
+    Map<String, Set<GameRuleListItem<?>>> ret = new TreeMap<>();
+    for (Map.Entry<String, GameRuleKey<?>> entry : rules.entrySet()) {
+      GameRuleKey<?> key = entry.getValue();
+      String modId = StringUtil.defaulted(key.getModId(),
+          StringUtil.translate(Constants.UNKNOWN_MOD_KEY, Constants.UNKNOWN_MOD_NAME));
       String modName = modIdToName.get(modId);
       if (modName == null)
         modName = modId;
-      Set<GameRuleListItem> entries = ret.get(modName);
+      Set<GameRuleListItem<?>> entries = ret.get(modName);
       if (entries == null) {
         entries = new TreeSet<>();
         ret.put(modName, entries);
       }
-      if (key.getType() == GameRules.Type.BOOLEAN)
-        entries.add(new SelectionGameRuleListItem(this.client, rule.getKey(), key,
-            this.gui.rules.get(rule.getKey()), new String[] {"true", "false"},
-            ((GameRulesKeyHook) key).getDefaultValue().equalsIgnoreCase("true") ? 0 : 1));
+      if (key.getType() == GameRuleTypes.BOOLEAN)
+        entries.add(SelectionGameRuleListItem.create(this.client, entry.getKey(), key,
+            this.gui.rules.get(entry.getKey()), new String[] {"true", "false"},
+            key.getDefaultValueAsString().equalsIgnoreCase("true") ? 0 : 1));
       else
-        entries.add(new FieldGameRuleListItem(client, rule.getKey(), key,
-            this.gui.rules.get(rule.getKey())));
+        entries.add(FieldGameRuleListItem.create(client, entry.getKey(), key,
+            this.gui.rules.get(entry.getKey())));
     }
     return ret;
   }
@@ -88,8 +89,8 @@ public class GameRuleListWidget extends ItemListWidget<GameRuleListWidget.ListIt
 
   @Override
   protected void renderList(int int_1, int int_2, int int_3, int int_4, float float_1) {
-    for (Set<GameRuleListItem> values : this.gamerules.values())
-      for (GameRuleListItem ruleListItem : values)
+    for (Set<GameRuleListItem<?>> values : this.gamerules.values())
+      for (GameRuleListItem<?> ruleListItem : values)
         ruleListItem.setMaxStringWidth(this.maxStringWidth);
     super.renderList(int_1, int_2, int_3, int_4, float_1);
   }
@@ -130,7 +131,7 @@ public class GameRuleListWidget extends ItemListWidget<GameRuleListWidget.ListIt
 
     this.gamerules.entrySet().stream().filter(e -> !e.getValue().isEmpty()
         && StringUtil.containsLowerCase(e.getKey().replaceAll("\\s", ""), mod)).forEach(e -> {
-          List<GameRuleListItem> toAdd = new ArrayList<>();
+          List<GameRuleListItem<?>> toAdd = new ArrayList<>();
           e.getValue().stream().filter(rule -> StringUtil.containsLowerCase(rule.ruleName, term))
               .forEachOrdered(toAdd::add);
           if (!toAdd.isEmpty()) {

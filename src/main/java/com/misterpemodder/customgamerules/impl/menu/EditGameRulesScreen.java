@@ -1,27 +1,28 @@
-package com.misterpemodder.customgamerules.impl.gui;
+package com.misterpemodder.customgamerules.impl.menu;
 
+import java.util.function.BiConsumer;
+import com.misterpemodder.customgamerules.api.CustomGameRules;
 import com.misterpemodder.customgamerules.impl.StringUtil;
-import com.misterpemodder.customgamerules.impl.gui.widget.GameRuleListWidget;
+import com.misterpemodder.customgamerules.impl.menu.widget.GameRuleListWidget;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.text.TranslatableTextComponent;
-import net.minecraft.world.GameRules;
 
 public class EditGameRulesScreen extends Screen {
-  public final Screen parent;
+  public final BiConsumer<Boolean, CustomGameRules> onClose;
   private TextFieldWidget searchBox;
   private GameRuleListWidget gameRuleList;
   private ButtonWidget saveButton;
   private ButtonWidget cancelButton;
 
-  public final GameRules rules;
+  public final CustomGameRules rules;
 
-  public EditGameRulesScreen(GameRules rules, Screen parent) {
+  public EditGameRulesScreen(CustomGameRules rules, BiConsumer<Boolean, CustomGameRules> onClose) {
     super(new TranslatableTextComponent("customgamerules.edit.title"));
-    this.parent = parent;
+    this.onClose = onClose;
     this.rules = rules;
   }
 
@@ -36,9 +37,9 @@ public class EditGameRulesScreen extends Screen {
     this.minecraft.keyboard.enableRepeatEvents(true);
     this.saveButton = addButton(new ButtonWidget(this.width / 2 - 154, this.height - 28, 150, 20,
         StringUtil.translate("selectWorld.edit.save", "Save"),
-        b -> this.minecraft.openScreen(this.parent)));
+        b -> this.onClose.accept(true, this.rules)));
     this.cancelButton = addButton(new ButtonWidget(this.width / 2 + 4, this.height - 28, 150, 20,
-        StringUtil.translate("gui.cancel", "Cancel"), b -> this.minecraft.openScreen(this.parent)));
+        StringUtil.translate("gui.cancel", "Cancel"), b -> this.onClose.accept(false, this.rules)));
     (this.searchBox = new TextFieldWidget(this.font, this.width / 2 - 100, 22, 200, 20))
         .setChangedListener(text -> {
           if (this.gameRuleList.filter(() -> text))

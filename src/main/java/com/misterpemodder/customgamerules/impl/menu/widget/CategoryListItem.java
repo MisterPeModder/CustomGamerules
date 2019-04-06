@@ -1,4 +1,4 @@
-package com.misterpemodder.customgamerules.impl.gui.widget;
+package com.misterpemodder.customgamerules.impl.menu.widget;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;

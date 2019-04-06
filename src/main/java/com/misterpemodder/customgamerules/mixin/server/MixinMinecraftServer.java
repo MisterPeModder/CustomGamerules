@@ -1,7 +1,6 @@
 package com.misterpemodder.customgamerules.mixin.server;
 
 import java.util.Map;
-import com.misterpemodder.customgamerules.impl.rule.ExtendedGameRuleValue;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -32,8 +31,7 @@ public class MixinMinecraftServer {
     GameRules rules = levelProperties.getGameRules();
     for (String key : GameRules.getKeys().keySet()) {
       GameRules.Value value = rules.get(key);
-      if (value instanceof ExtendedGameRuleValue)
-        value.set(value.getString(), (MinecraftServer) (Object) this);
+      value.set(value.getString(), (MinecraftServer) (Object) this);
     }
   }
 }

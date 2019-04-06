@@ -1,23 +1,31 @@
-package com.misterpemodder.customgamerules.impl.gui.widget;
+package com.misterpemodder.customgamerules.impl.menu.widget;
 
 import java.util.List;
 import com.google.common.collect.ImmutableList;
+import com.misterpemodder.customgamerules.api.rule.key.GameRuleKey;
+import com.misterpemodder.customgamerules.api.rule.value.GameRuleValue;
 import com.misterpemodder.customgamerules.mixin.client.gui.widget.TextFieldPosAccessor;
 import org.lwjgl.glfw.GLFW;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.world.GameRules;
 
-public class FieldGameRuleListItem extends GameRuleListItem {
+public class FieldGameRuleListItem<V> extends GameRuleListItem<V> {
   private final TextFieldWidget editField;
   private Element focusedElement = null;
 
-  public FieldGameRuleListItem(MinecraftClient client, String ruleName, GameRules.Key ruleKey,
-      GameRules.Value ruleValue) {
+  public FieldGameRuleListItem(MinecraftClient client, String ruleName, GameRuleKey<V> ruleKey,
+      GameRuleValue<V> ruleValue) {
     super(client, ruleName, ruleKey, ruleValue);
     this.editField = new TextFieldWidget(this.client.textRenderer, 0, 0, 76, 20);
-    this.editField.setText(this.ruleKey.getDefaultValue());
+    this.editField.setText(this.ruleKey.getDefaultValueAsString());
+  }
+
+  @SuppressWarnings("unchecked")
+  public static FieldGameRuleListItem<?> create(MinecraftClient client, String ruleName,
+      GameRuleKey<?> ruleKey, GameRuleValue<?> ruleValue) {
+    return new FieldGameRuleListItem<Object>(client, ruleName,
+        (GameRuleKey<Object>) (Object) ruleKey, (GameRuleValue<Object>) (Object) ruleValue);
   }
 
   @Override
@@ -71,7 +79,7 @@ public class FieldGameRuleListItem extends GameRuleListItem {
 
   @Override
   public void onReset() {
-    this.editField.setText(this.ruleKey.getDefaultValue());
+    this.editField.setText(this.ruleKey.getDefaultValueAsString());
   }
 
   @Override
@@ -80,8 +88,14 @@ public class FieldGameRuleListItem extends GameRuleListItem {
     this.resetButton.active = !this.editField.getText().equals(this.ruleKey.getDefaultValue());
     super.render(listX, listY, width, height, x, y, integer_7, selected, partial);
 
-    // TODO Add better type validation to API
-    //this.editField.method_1868(color);
+    this.editField.method_1868(0xe0e0e0);
+    try {
+      V parsedValue = this.ruleKey.getType().parse(this.editField.getText());
+      if (!this.ruleKey.isValidValue(parsedValue))
+        this.editField.method_1868(0xff5555);
+    } catch (IllegalArgumentException e) {
+      this.editField.method_1868(0xff5555);
+    }
 
     ((TextFieldPosAccessor) this.editField).cg$setXPos(width + 107);
     ((TextFieldPosAccessor) this.editField).cg$setYPos(listY);
@@ -101,7 +115,7 @@ public class FieldGameRuleListItem extends GameRuleListItem {
   }
 
   @Override
-  public int compareTo(GameRuleListItem other) {
+  public int compareTo(GameRuleListItem<V> other) {
     return this.ruleName.compareTo(other.ruleName);
   }
 

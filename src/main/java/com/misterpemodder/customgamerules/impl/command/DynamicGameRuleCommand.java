@@ -1,6 +1,9 @@
 package com.misterpemodder.customgamerules.impl.command;
 
 import java.util.Map;
+import com.misterpemodder.customgamerules.api.CustomGameRules;
+import com.misterpemodder.customgamerules.api.rule.key.GameRuleKey;
+import com.misterpemodder.customgamerules.api.rule.type.GameRuleType;
 import com.misterpemodder.customgamerules.impl.proxy.SidedProxy;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
@@ -23,19 +26,20 @@ public final class DynamicGameRuleCommand {
     LiteralArgumentBuilder<ServerCommandSource> builder =
         (LiteralArgumentBuilder<ServerCommandSource>) ServerCommandManager.literal(NAME)
             .requires(source -> source.hasPermissionLevel(2));
-    for (final Map.Entry<String, GameRules.Key> var3 : GameRules.getKeys().entrySet())
-      builder.then(createGameRuleNode(var3.getKey(), var3.getValue().getType()));
+    for (Map.Entry<String, GameRuleKey<?>> entry : CustomGameRules.getKeys().entrySet())
+      builder.then(createGameRuleNode(entry.getKey(), entry.getValue().getType()));
     return builder;
   }
 
   private static CommandNode<ServerCommandSource> createGameRuleNode(String name,
-      GameRules.Type type) {
-    return ServerCommandManager.literal(name).executes(ctx -> queryValue(ctx.getSource(), name))
-        .then(type.method_8371("value").executes(ctx -> setValue(ctx.getSource(), name, ctx)))
+      GameRuleType<?> type) {
+    return ServerCommandManager
+        .literal(name).executes(ctx -> queryValue(ctx.getSource(), name)).then(type
+            .createCommandArgument("value").executes(ctx -> setValue(ctx.getSource(), name, ctx)))
         .build();
   }
 
-  public static void addGameRule(String name, GameRules.Type type) {
+  public static void addGameRule(String name, GameRuleType<?> type) {
     MinecraftServer server = PROXY.getServerInstance();
     if (server == null)
       return;

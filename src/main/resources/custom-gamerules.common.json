@@ -6,7 +6,9 @@
     "server.command.MixinGameRuleCommand",
     "server.MixinMinecraftServer",
     "world.MixinGameRules",
-    "world.MixinGameRulesKey"
+    "world.MixinGameRulesKey",
+    "world.MixinGameRulesType",
+    "world.MixinGameRulesValue"
   ],
   "injectors": {
     "defaultRequire": 1
