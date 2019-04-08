@@ -60,6 +60,7 @@ public class MixinGameRulesValue implements GameRuleValue<Object>, GameRuleExten
     this.cg$initialized = true;
     this.cg$type = type;
     this.cg$key = key;
+    this.cg$value = type.getDefaultValue();
 
     this.type = GameRuleExtensions.getVanillaType(type);
     this.applyConsumer = GameRuleExtensions.getVanillaUpdateHandler(this);

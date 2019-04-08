@@ -32,7 +32,11 @@ public interface CustomGameRules {
 
   <T> GameRuleValue<T> get(GameRuleType<T> type, String key);
 
+  <T> GameRuleValue<T> get(GameRuleKey<T> key);
+
   <T> T getValue(GameRuleType<T> type, String key);
+
+  <T> T getValue(GameRuleKey<T> key);
 
   GameRules toVanilla();
 }

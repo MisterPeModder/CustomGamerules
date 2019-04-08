@@ -113,6 +113,7 @@ public class GameRuleListWidget extends ItemListWidget<GameRuleListWidget.ListIt
   }
 
   /**
+   * @param filter The filter.
    * @return true if the filtered list item changed.
    */
   public boolean filter(final Supplier<String> filter) {

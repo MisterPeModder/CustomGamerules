@@ -31,23 +31,23 @@ public class GameRuleTypeImpl<V> implements GameRuleType<V> {
   }
 
   public static GameRuleTypeImpl<String> stringType() {
-    return new GameRuleTypeImpl<String>(String.class, "string", "", s -> s, s -> s,
-        StringArgumentType::string);
+    return new GameRuleTypeImpl<String>(String.class, "string", "", Function.identity(),
+        Function.identity(), StringArgumentType::string);
   }
 
   public static GameRuleTypeImpl<Boolean> booleanType() {
     return new GameRuleTypeImpl<Boolean>(Boolean.class, "boolean", false, Boolean::valueOf,
-        f -> f.toString(), BoolArgumentType::bool);
+        Object::toString, BoolArgumentType::bool);
   }
 
   public static GameRuleTypeImpl<Integer> integerType() {
     return new GameRuleTypeImpl<Integer>(Integer.class, "integer", 0, Integer::valueOf,
-        f -> f.toString(), IntegerArgumentType::integer);
+        Object::toString, IntegerArgumentType::integer);
   }
 
   public static GameRuleTypeImpl<Float> floatType() {
-    return new GameRuleTypeImpl<Float>(Float.class, "float", 0.0F, Float::valueOf,
-        f -> f.toString(), FloatArgumentType::floatArg);
+    return new GameRuleTypeImpl<Float>(Float.class, "float", 0.0F, Float::valueOf, Object::toString,
+        FloatArgumentType::floatArg);
   }
 
   public static GameRuleTypeImpl<Double> doubleType() {

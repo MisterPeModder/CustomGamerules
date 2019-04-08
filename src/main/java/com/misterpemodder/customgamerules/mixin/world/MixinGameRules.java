@@ -1,20 +1,20 @@
 package com.misterpemodder.customgamerules.mixin.world;
 
-import java.util.Map;
 import java.util.TreeMap;
 import com.misterpemodder.customgamerules.api.CustomGameRules;
+import com.misterpemodder.customgamerules.api.rule.key.GameRuleKey;
 import com.misterpemodder.customgamerules.api.rule.type.GameRuleType;
 import com.misterpemodder.customgamerules.api.rule.value.GameRuleValue;
 import com.misterpemodder.customgamerules.impl.Constants;
 import com.misterpemodder.customgamerules.impl.registry.GameRuleRegistryImpl;
 import com.misterpemodder.customgamerules.impl.registry.GameRuleRegistryImpl.ExtraGameRulesKeyMap;
 import com.misterpemodder.customgamerules.impl.registry.GameRuleRegistryImpl.ExtraGameRulesValueMap;
-import com.misterpemodder.customgamerules.impl.rule.GameRuleExtensions;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -48,21 +48,15 @@ public class MixinGameRules implements CustomGameRules {
       target = "Lnet/minecraft/util/SystemUtil;consume(Ljava/lang/Object;Ljava/util/function/Consumer;)Ljava/lang/Object;",
       ordinal = 0), method = "<clinit>", index = 0)
   private static Object modifyVanillaKeyMap(Object map) {
+    GameRuleRegistryImpl.setDefaultNamespace(Constants.MC_MOD_ID);
     return new ExtraGameRulesKeyMap();
   }
 
-  @Inject(at = @At("HEAD"),
-      method = "Lnet/minecraft/world/GameRules;method_8353(Ljava/util/TreeMap;)V")
-  private static void vanillaGameRuleStart(TreeMap<String, GameRules.Key> map, CallbackInfo ci) {
-    GameRuleRegistryImpl.setWarnOnRegister(false);
-  }
-
-  @Inject(at = @At("TAIL"),
-      method = "Lnet/minecraft/world/GameRules;method_8353(Ljava/util/TreeMap;)V")
-  private static void vanillaGameRulesEnd(TreeMap<String, GameRules.Key> map, CallbackInfo ci) {
-    GameRuleRegistryImpl.setWarnOnRegister(true);
-    for (Map.Entry<String, GameRules.Key> entry : map.entrySet())
-      GameRuleExtensions.initKeyDefault(Constants.MC_MOD_ID, entry.getKey(), entry.getValue());
+  @Inject(at = @At(value = "INVOKE",
+      target = "Lnet/minecraft/util/SystemUtil;consume(Ljava/lang/Object;Ljava/util/function/Consumer;)Ljava/lang/Object;",
+      ordinal = 0, shift = Shift.AFTER), method = "<clinit>")
+  private static void endVanillaNamespace(CallbackInfo ci) {
+    GameRuleRegistryImpl.setDefaultNamespace(Constants.UNKNOWN_MOD_ID);
   }
 
   @Override
@@ -87,11 +81,23 @@ public class MixinGameRules implements CustomGameRules {
 
   @Override
   @SuppressWarnings("unchecked")
+  public <T> GameRuleValue<T> get(GameRuleKey<T> key) {
+    return (GameRuleValue<T>) getRules().get(key.getName());
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
   public <T> T getValue(GameRuleType<T> type, String key) {
     GameRuleValue<?> value = getRules().get(key);
     if (value.getType() != type)
       return type.getDefaultValue();
     return ((GameRuleValue<T>) value).get();
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public <T> T getValue(GameRuleKey<T> key) {
+    return ((GameRuleValue<T>) getRules().get(key.getName())).get();
   }
 
   @Override

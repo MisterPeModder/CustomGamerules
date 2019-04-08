@@ -18,9 +18,11 @@ import net.minecraft.world.GameRules;
 
 public class GameRuleRegistryImpl implements GameRuleRegistry {
   private static boolean warnOnRegister = true;
+  private static String defaultNamspace = Constants.UNKNOWN_MOD_ID;
 
-  public static void setWarnOnRegister(boolean value) {
-    warnOnRegister = value;
+  public static void setDefaultNamespace(String value) {
+    defaultNamspace = value;
+    warnOnRegister = value.equals(Constants.UNKNOWN_MOD_ID);
   }
 
   public static Registry<GameRuleType<?>> createTypeRegistry() {
@@ -71,9 +73,9 @@ public class GameRuleRegistryImpl implements GameRuleRegistry {
       if (!GameRuleExtensions.isKeyInitialized(key)) {
         if (GameRuleRegistryImpl.warnOnRegister)
           Constants.LOGGER.warn("[CustomGameRules API]: game rule " + name
-              + " does not have CustomGameRules metadata, registering as "
-              + Constants.UNKNOWN_MOD_ID + ":" + name);
-        GameRuleExtensions.initKeyDefault(Constants.UNKNOWN_MOD_ID, name, key);
+              + " does not have CustomGameRules metadata, registering as " + defaultNamspace + ":"
+              + name);
+        GameRuleExtensions.initKeyDefault(defaultNamspace, name, key);
       }
       return key;
     }
