@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -21,6 +22,7 @@ import com.misterpemodder.customgamerules.impl.menu.EditGameRulesScreen;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.widget.ItemListWidget;
 import net.minecraft.util.math.MathHelper;
 
@@ -83,10 +85,6 @@ public class GameRuleListWidget extends ItemListWidget<GameRuleListWidget.ListIt
     return ret;
   }
 
-  public void setRenderSelection(boolean renderSelection) {
-    this.renderSelection = renderSelection;
-  }
-
   @Override
   protected void renderList(int int_1, int int_2, int int_3, int int_4, float float_1) {
     for (Set<GameRuleListItem<?>> values : this.gamerules.values())
@@ -97,19 +95,24 @@ public class GameRuleListWidget extends ItemListWidget<GameRuleListWidget.ListIt
 
   @Override
   public boolean keyPressed(int keyCode, int int_2, int int_3) {
-    return getSelected().map(i -> i.keyPressed(keyCode, int_2, int_3)).get()
+    return mapOnSelected(i -> i.keyPressed(keyCode, int_2, int_3))
         || super.keyPressed(keyCode, int_2, int_3);
   }
 
   @Override
   public boolean keyReleased(int keyCode, int int_2, int int_3) {
-    return getSelected().map(i -> i.keyReleased(keyCode, int_2, int_3)).get()
+    return mapOnSelected(i -> i.keyReleased(keyCode, int_2, int_3))
         || super.keyReleased(keyCode, int_2, int_3);
   }
 
   @Override
   public boolean charTyped(char chr, int keyCode) {
-    return getSelected().map(i -> i.charTyped(chr, keyCode)).get() || super.charTyped(chr, keyCode);
+    return mapOnSelected(i -> i.charTyped(chr, keyCode)) || super.charTyped(chr, keyCode);
+  }
+
+  private boolean mapOnSelected(Function<ListItem, Boolean> map) {
+    Optional<Boolean> result = getSelected().map(map);
+    return result.isPresent() && result.get();
   }
 
   /**
@@ -182,25 +185,18 @@ public class GameRuleListWidget extends ItemListWidget<GameRuleListWidget.ListIt
         int index = children().indexOf(item);
         setFocused(item);
         if (current.isPresent() && index >= 0 && index < this.getItemCount()) {
-          method_20069(index - children().indexOf(current.get()));
+          moveSelection(index - children().indexOf(current.get()));
         }
         return true;
       }
     return super.mouseClicked(double_1, double_2, int_1);
   }
 
-  // moveSelection()
   @Override
-  protected void method_20069(int distance) {
+  protected void moveSelection(int distance) {
     Optional<ListItem> selected =
         setSelected(MathHelper.clamp(this.selectedId + distance, 0, this.getItemCount() - 1));
-    //scrolls to 'selected'
-    selected.ifPresent(this::method_20072);
-  }
-
-  @Override
-  public boolean isPartOfFocusCycle() {
-    return true;
+    selected.ifPresent(this::ensureVisible);
   }
 
   public Optional<ListItem> getSelected() {
@@ -213,9 +209,18 @@ public class GameRuleListWidget extends ItemListWidget<GameRuleListWidget.ListIt
   }
 
   @Override
-  public void onFocusChanged(boolean boolean_1, boolean hasFocus) {
-    if (hasFocus && !this.getSelected().isPresent() && this.getItemCount() > 1)
+  public boolean changeFocus(boolean shiftPressed) {
+    if (this.gui.getFocused() != this) {
       setSelected(1);
+      return true;
+    } else {
+      List<? extends Element> siblings = this.gui.children();
+      int index = (siblings.indexOf(this) + 1) % siblings.size();
+      setSelected(-1);
+      this.gui.setFocused(siblings.get(index));
+      this.gui.changeFocus(shiftPressed);
+    }
+    return true;
   }
 
   public abstract static class ListItem extends ItemListWidget.Item<ListItem> {

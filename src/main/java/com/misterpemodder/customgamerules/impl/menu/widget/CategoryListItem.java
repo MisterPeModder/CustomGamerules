@@ -27,4 +27,9 @@ public class CategoryListItem extends GameRuleListWidget.ListItem
   public int compareTo(CategoryListItem other) {
     return this.name.compareToIgnoreCase(other.name);
   }
+
+  @Override
+  public boolean changeFocus(boolean boolean_1) {
+    return true;
+  }
 }
