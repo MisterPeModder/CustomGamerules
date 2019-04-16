@@ -62,6 +62,7 @@ public class GameRuleRegistryImpl implements GameRuleRegistry {
           + ", type " + type.getTypeName() + " is not registered.");
     GameRuleKey<T> key =
         GameRuleExtensions.newKey(modId, name, type, defaultValue, onUpdate, validator);
+    CustomGameRules.getKeys().put(name, key);
     DynamicGameRuleCommand.addGameRule(name, type);
     return key;
   }

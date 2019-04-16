@@ -10,7 +10,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.CommandNode;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.GameRuleCommand;
-import net.minecraft.server.command.ServerCommandManager;
+import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.TranslatableTextComponent;
 import net.minecraft.world.GameRules;
@@ -24,7 +24,7 @@ public final class DynamicGameRuleCommand {
 
   public static LiteralArgumentBuilder<ServerCommandSource> create() {
     LiteralArgumentBuilder<ServerCommandSource> builder =
-        (LiteralArgumentBuilder<ServerCommandSource>) ServerCommandManager.literal(NAME)
+        (LiteralArgumentBuilder<ServerCommandSource>) CommandManager.literal(NAME)
             .requires(source -> source.hasPermissionLevel(2));
     for (Map.Entry<String, GameRuleKey<?>> entry : CustomGameRules.getKeys().entrySet())
       builder.then(createGameRuleNode(entry.getKey(), entry.getValue().getType()));
@@ -33,7 +33,7 @@ public final class DynamicGameRuleCommand {
 
   private static CommandNode<ServerCommandSource> createGameRuleNode(String name,
       GameRuleType<?> type) {
-    return ServerCommandManager
+    return CommandManager
         .literal(name).executes(ctx -> queryValue(ctx.getSource(), name)).then(type
             .createCommandArgument("value").executes(ctx -> setValue(ctx.getSource(), name, ctx)))
         .build();
@@ -52,7 +52,7 @@ public final class DynamicGameRuleCommand {
   private static int setValue(ServerCommandSource source, String string,
       CommandContext<ServerCommandSource> ctx) {
     GameRules.Value value4 = source.getMinecraftServer().getGameRules().get(string);
-    value4.getType().method_8370(ctx, "value", value4);
+    value4.getType().set(ctx, "value", value4);
     source.sendFeedback(new TranslatableTextComponent("commands.gamerule.set",
         new Object[] {string, value4.getString()}), true);
     return value4.getInteger();

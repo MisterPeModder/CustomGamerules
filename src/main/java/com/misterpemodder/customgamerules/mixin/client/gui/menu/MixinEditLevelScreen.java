@@ -7,12 +7,12 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.client.gui.Screen;
-import net.minecraft.client.gui.menu.BackupLevelScreen;
+import net.minecraft.client.gui.menu.EditLevelScreen;
 import net.minecraft.text.TextComponent;
 
-@Mixin(BackupLevelScreen.class)
-public abstract class MixinBackupLevelScreen extends Screen {
-  protected MixinBackupLevelScreen(TextComponent name) {
+@Mixin(EditLevelScreen.class)
+public abstract class MixinEditLevelScreen extends Screen {
+  protected MixinEditLevelScreen(TextComponent name) {
     super(name);
   }
 

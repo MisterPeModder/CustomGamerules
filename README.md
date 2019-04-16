@@ -1,8 +1,8 @@
 CustomGamerules API  
-[![Maven Repository](https://img.shields.io/maven-metadata/v/https/maven.misterpemodder.com/list/libs-release/com/misterpemodder/custom-gamerules/maven-metadata.xml.svg)](https://maven.misterpemodder.com/libs-release/com/misterpemodder/custom-gamerules)
+[![Maven Repository](https://img.shields.io/maven-metadata/v/https/maven.misterpemodder.com/libs-release/com/misterpemodder/custom-gamerules/maven-metadata.xml.svg)](https://maven.misterpemodder.com/libs-release/com/misterpemodder/custom-gamerules)
 [![](http://cf.way2muchnoise.eu/full_314538_downloads.svg)](https://minecraft.curseforge.com/projects/customgamerules-api)
 [![](http://cf.way2muchnoise.eu/versions/For%20MC_314538_all.svg)](https://minecraft.curseforge.com/projects/customgamerules-api)
-=========================
+========================= 
 
 A modding API that provides a way to register custom gamerules
 and adds a gamerules menu.

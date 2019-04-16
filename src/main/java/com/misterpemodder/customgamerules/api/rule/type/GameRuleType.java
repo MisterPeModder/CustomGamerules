@@ -5,7 +5,7 @@ import javax.annotation.Nullable;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
-import net.minecraft.server.command.ServerCommandManager;
+import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.world.GameRules;
 
@@ -66,6 +66,6 @@ public interface GameRuleType<V> {
    * @return The argument builder.
    */
   default RequiredArgumentBuilder<ServerCommandSource, ?> createCommandArgument(String name) {
-    return ServerCommandManager.argument(name, getArgumentType());
+    return CommandManager.argument(name, getArgumentType());
   }
 }

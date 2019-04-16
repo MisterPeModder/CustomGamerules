@@ -18,11 +18,11 @@ public class MixinGameRulesType {
   @Shadow
   @Final
   @Mutable
-  private Supplier<ArgumentType<?>> field_9208;
+  private Supplier<ArgumentType<?>> argumentType;
   //private ThreadLocal<Supplier<ArgumentType<?>>> cg$argumentTypeSupplier = new ThreadLocal<>();
 
   @Inject(at = @At(value = "HEAD"),
-      method = "Lnet/minecraft/world/GameRules$Type;method_8370"
+      method = "Lnet/minecraft/world/GameRules$Type;set"
           + "(Lcom/mojang/brigadier/context/CommandContext;"
           + "Ljava/lang/String;Lnet/minecraft/world/GameRules$Value;)V")
   private void changeArgumentTypeSupplier(CommandContext<ServerCommandSource> ctx, String name,
@@ -36,8 +36,8 @@ public class MixinGameRulesType {
   /*
   @Redirect(
       at = @At(value = "FIELD",
-          target = "Lnet/minecraft/world/GameRules$Type;field_9208:Ljava/util/function/Supplier;"),
-      method = "Lnet/minecraft/world/GameRules$Type;method_8370"
+          target = "Lnet/minecraft/world/GameRules$Type;argumentType:Ljava/util/function/Supplier;"),
+      method = "Lnet/minecraft/world/GameRules$Type;set"
           + "(Lcom/mojang/brigadier/context/CommandContext;"
           + "Ljava/lang/String;Lnet/minecraft/world/GameRules$Value;)V")
   private Supplier<ArgumentType<?>> changeArgumentTypeSupplier(GameRules.Type owner) {

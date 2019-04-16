@@ -3,7 +3,7 @@
   "package": "com.misterpemodder.customgamerules.mixin.client",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "gui.menu.MixinBackupLevelScreen",
+    "gui.menu.MixinEditLevelScreen",
     "gui.menu.MixinScreen",
     "gui.widget.TextFieldPosAccessor"
   ],
