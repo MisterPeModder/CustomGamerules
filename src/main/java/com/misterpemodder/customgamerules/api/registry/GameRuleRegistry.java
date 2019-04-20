@@ -1,10 +1,12 @@
 package com.misterpemodder.customgamerules.api.registry;
 
+import javax.annotation.Nullable;
 import com.misterpemodder.customgamerules.api.rule.key.GameRuleKey;
 import com.misterpemodder.customgamerules.api.rule.type.GameRuleType;
 import com.misterpemodder.customgamerules.api.rule.value.ValueUpdateHandler;
 import com.misterpemodder.customgamerules.api.rule.value.ValueValidator;
 import com.misterpemodder.customgamerules.impl.registry.GameRuleRegistryImpl;
+import com.misterpemodder.customgamerules.impl.registry.GameRuleRegistryImpl.GameRuleSettingsImpl;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
@@ -29,14 +31,15 @@ public interface GameRuleRegistry {
 
   /**
    * Registers a custom game rule.
-   * The default value will be set to the type default.
+   * Same as {@link GameRuleRegistry#register(String, String, GameRuleSettings)} with
+   * {@code settings = GameRuleSettings.of(type)}
    * 
    * @param <T>   The underlying value type.
    * @param modId The registering mod id.
    * @param name  The game rule name.
    * @param type  Its type, if not registered this method
    *                     will throw an {@link IllegalArgumentException}.
-   * @return the registered type.
+   * @return the registered rule.
    */
   public <T> GameRuleKey<T> register(String modId, String name, GameRuleType<T> type);
 
@@ -46,60 +49,41 @@ public interface GameRuleRegistry {
    * @param <T>          The underlying value type.
    * @param modId        The registering mod id.
    * @param name         The game rule name.
-   * @param type         Its type, if not registered this method
-   *                     will throw an {@link IllegalArgumentException}.
-   * @param defaultValue The default value.
-   * @return the registered type.
+   * @param settings     The rule settings, see {@link GameRuleSettings} for more details.
+   * @return the registered rule.
    */
-  public <T> GameRuleKey<T> register(String modId, String name, GameRuleType<T> type,
-      T defaultValue);
+  public <T> GameRuleKey<T> register(String modId, String name, GameRuleSettings<T> settings);
 
-  /**
-   * Registers a custom game rule.
-   * 
-   * @param <T>          The underlying value type.
-   * @param modId        The registering mod id.
-   * @param name         The game rule name.
-   * @param type         Its type, if not registered this method
-   *                     will throw an {@link IllegalArgumentException}.
-   * @param defaultValue The default value.
-   * @param onUpdate     Called after the value is set, the server argument may be {@code null}.
-   * @return the registered type.
-   * 
-   * @throws IllegalArgumentException if {@code type} is not registered.
-   */
-  public <T> GameRuleKey<T> register(String modId, String name, GameRuleType<T> type,
-      T defaultValue, ValueUpdateHandler<T> onUpdate);
+  public static interface GameRuleSettings<T> {
+    public static <T> GameRuleSettings<T> of(GameRuleType<T> type) {
+      return new GameRuleSettingsImpl<T>(type);
+    }
 
-  /**
-   * Registers a custom game rule.
-   * 
-   * @param <T>          The underlying value type.
-   * @param modId        The registering mod id.
-   * @param name         The game rule name.
-   * @param type         Its type, if not registered this method
-   *                     will throw an {@link IllegalArgumentException}.
-   * @param validator    The validator
-   * @param defaultValue The default value.
-   * @param validator    The validator.
-   * @return the registered type.
-  */
-  public <T> GameRuleKey<T> register(String modId, String name, GameRuleType<T> type,
-      T defaultValue, ValueValidator<T> validator);
+    public static <T> GameRuleSettings<T> copy(GameRuleSettings<T> original) {
+      return GameRuleSettingsImpl.copy(original);
+    }
 
-  /**
-   * Registers a custom game rule.
-   * 
-   * @param <T>          The underlying value type.
-   * @param modId        The registering mod id.
-   * @param name         The game rule name.
-   * @param type         Its type, if not registered this method
-   *                     will throw an {@link IllegalArgumentException}.
-   * @param validator    The validator
-   * @param defaultValue The default value.
-   * @param onUpdate     Called after the value is set, the server argument may be {@code null}.
-   * @return the registered type.
-   */
-  public <T> GameRuleKey<T> register(String modId, String name, GameRuleType<T> type,
-      T defaultValue, ValueUpdateHandler<T> onUpdate, ValueValidator<T> validator);
+    public static <T> GameRuleSettings<T> copy(GameRuleKey<T> key) {
+      return GameRuleSettingsImpl.copy(key);
+    }
+
+    public GameRuleSettings<T> defaultValue(T defaultValue);
+
+    public GameRuleSettings<T> onUpdate(ValueUpdateHandler<T> onUpdate);
+
+    public GameRuleSettings<T> validator(ValueValidator<T> validator);
+
+    public GameRuleSettings<T> description(@Nullable String key);
+
+    public GameRuleType<T> getType();
+
+    public T getDefaultValue();
+
+    public ValueUpdateHandler<T> getUpdateHandler();
+
+    public ValueValidator<T> getValidator();
+
+    @Nullable
+    public String getDescription();
+  }
 }

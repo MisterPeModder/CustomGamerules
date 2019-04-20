@@ -3,6 +3,8 @@ package com.misterpemodder.customgamerules.api.rule.key;
 import javax.annotation.Nullable;
 import com.misterpemodder.customgamerules.api.rule.type.GameRuleType;
 import com.misterpemodder.customgamerules.api.rule.value.GameRuleValue;
+import com.misterpemodder.customgamerules.api.rule.value.ValueUpdateHandler;
+import com.misterpemodder.customgamerules.api.rule.value.ValueValidator;
 import net.minecraft.server.MinecraftServer;
 
 public interface GameRuleKey<V> {
@@ -16,9 +18,19 @@ public interface GameRuleKey<V> {
 
   V getDefaultValue();
 
-  void onValueUpdate(@Nullable MinecraftServer server, GameRuleValue<V> value);
+  ValueUpdateHandler<V> getUpdateHandler();
 
-  boolean isValidValue(V value);
+  ValueValidator<V> getValidator();
+
+  default void onValueUpdate(@Nullable MinecraftServer server, GameRuleValue<V> value) {
+    getUpdateHandler().after(server, value);
+  }
+
+  default boolean isValidValue(V value) {
+    return getValidator().isValid(value);
+  }
 
   GameRuleValue<V> createValue();
+
+  String getDescription();
 }

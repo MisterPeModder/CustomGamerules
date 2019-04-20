@@ -45,6 +45,7 @@ public final class MixinGameRulesKey implements GameRuleKey<Object>, GameRuleExt
   private ValueUpdateHandler<Object> cg$onUpdate;
   private ValueValidator<Object> cg$validator;
   private boolean cg$cancelUpdateNoServer;
+  private String cg$descriptionKey;
 
   @SuppressWarnings("unchecked")
   @Inject(at = @At("RETURN"),
@@ -59,6 +60,7 @@ public final class MixinGameRulesKey implements GameRuleKey<Object>, GameRuleExt
     this.cg$onUpdate = GameRuleExtensions.DUMMY_UPDATE_HANDLER;
     this.cg$validator = GameRuleExtensions.DUMMY_VALIDATOR;
     this.cg$cancelUpdateNoServer = true;
+    this.cg$descriptionKey = "errored description - report as bug";
   }
 
   @Override
@@ -69,7 +71,7 @@ public final class MixinGameRulesKey implements GameRuleKey<Object>, GameRuleExt
   @Override
   public void cg$initExtensions(String modId, String ruleName, GameRuleType<Object> type,
       Object defaultValue, ValueUpdateHandler<Object> onUpdate, ValueValidator<Object> validator,
-      boolean cancelUpdateNoServer) {
+      boolean cancelUpdateNoServer, String descriptionKey) {
     this.cg$initialized = true;
     this.cg$modId = modId;
     this.cg$ruleName = ruleName;
@@ -77,6 +79,7 @@ public final class MixinGameRulesKey implements GameRuleKey<Object>, GameRuleExt
     this.cg$validator = validator;
     this.cg$defaultValueObj = defaultValue;
     this.cg$cancelUpdateNoServer = cancelUpdateNoServer;
+    this.cg$descriptionKey = descriptionKey;
 
     if (onUpdate == null) {
       this.cg$onUpdate = GameRuleExtensions.getCGUpdateHandler(this.field_9204);
@@ -115,6 +118,16 @@ public final class MixinGameRulesKey implements GameRuleKey<Object>, GameRuleExt
   }
 
   @Override
+  public ValueUpdateHandler<Object> getUpdateHandler() {
+    return this.cg$onUpdate;
+  }
+
+  @Override
+  public ValueValidator<Object> getValidator() {
+    return this.cg$validator;
+  }
+
+  @Override
   public void onValueUpdate(MinecraftServer server, GameRuleValue<Object> value) {
     if (server != null || !this.cg$cancelUpdateNoServer)
       this.cg$onUpdate.after(server, value);
@@ -128,6 +141,11 @@ public final class MixinGameRulesKey implements GameRuleKey<Object>, GameRuleExt
   @Override
   public GameRuleValue<Object> createValue() {
     return GameRuleExtensions.newValue(this.cg$type, this);
+  }
+
+  @Override
+  public String getDescription() {
+    return this.cg$descriptionKey;
   }
 
   @Inject(at = @At("HEAD"), method = "Lnet/minecraft/world/GameRules$Key;createValue()"

@@ -7,6 +7,7 @@ import com.misterpemodder.customgamerules.api.CustomGameRules;
 import com.misterpemodder.customgamerules.api.registry.GameRuleRegistry;
 import com.misterpemodder.customgamerules.api.rule.key.GameRuleKey;
 import com.misterpemodder.customgamerules.api.rule.type.GameRuleType;
+import com.misterpemodder.customgamerules.api.rule.type.GameRuleTypes;
 import com.misterpemodder.customgamerules.api.rule.value.ValueUpdateHandler;
 import com.misterpemodder.customgamerules.api.rule.value.ValueValidator;
 import com.misterpemodder.customgamerules.impl.Constants;
@@ -31,37 +32,19 @@ public class GameRuleRegistryImpl implements GameRuleRegistry {
 
   @Override
   public <T> GameRuleKey<T> register(String modId, String name, GameRuleType<T> type) {
-    return register(modId, name, type, type.getDefaultValue(), ValueUpdateHandler.noUpdate(),
-        ValueValidator.alwaysValid());
+    return register(modId, name, GameRuleSettings.of(type));
   }
 
   @Override
-  public <T> GameRuleKey<T> register(String modId, String name, GameRuleType<T> type,
-      T defaultValue) {
-    return register(modId, name, type, defaultValue, ValueUpdateHandler.noUpdate(),
-        ValueValidator.alwaysValid());
-  }
-
-  @Override
-  public <T> GameRuleKey<T> register(String modId, String name, GameRuleType<T> type,
-      T defaultValue, ValueValidator<T> validator) {
-    return register(modId, name, type, defaultValue, ValueUpdateHandler.noUpdate(), validator);
-  }
-
-  @Override
-  public <T> GameRuleKey<T> register(String modId, String name, GameRuleType<T> type,
-      T defaultValue, ValueUpdateHandler<T> onUpdate) {
-    return register(modId, name, type, defaultValue, onUpdate, ValueValidator.alwaysValid());
-  }
-
-  @Override
-  public <T> GameRuleKey<T> register(String modId, String name, GameRuleType<T> type,
-      T defaultValue, ValueUpdateHandler<T> onUpdate, ValueValidator<T> validator) {
+  public <T> GameRuleKey<T> register(String modId, String name, GameRuleSettings<T> settings) {
+    GameRuleType<T> type = settings.getType();
     if (GameRuleRegistry.TYPE_REGISTRY.getId(type) == null)
       throw new IllegalArgumentException("Couldn't register gamerule " + modId + ":" + name
           + ", type " + type.getTypeName() + " is not registered.");
-    GameRuleKey<T> key =
-        GameRuleExtensions.newKey(modId, name, type, defaultValue, onUpdate, validator);
+    String descriptionKey = settings.getDescription();
+    GameRuleKey<T> key = GameRuleExtensions.newKey(modId, name, type, settings.getDefaultValue(),
+        settings.getUpdateHandler(), settings.getValidator(),
+        descriptionKey == null ? "gamerule." + modId + "." + name + ".desc" : descriptionKey);
     CustomGameRules.getKeys().put(name, key);
     DynamicGameRuleCommand.addGameRule(name, type);
     return key;
@@ -130,6 +113,94 @@ public class GameRuleRegistryImpl implements GameRuleRegistry {
     @Override
     public GameRules.Value putIfAbsent(String key, GameRules.Value value) {
       return super.putIfAbsent(key, getExtendedKey(key, value));
+    }
+  }
+
+  public static class GameRuleSettingsImpl<T> implements GameRuleSettings<T> {
+    private GameRuleType<T> type;
+    private T defaultValue;
+    private ValueUpdateHandler<T> onUpdate;
+    private ValueValidator<T> validator;
+    private String description;
+
+
+    public GameRuleSettingsImpl(GameRuleType<T> type) {
+      this.type = type;
+    }
+
+    @Override
+    public GameRuleSettings<T> defaultValue(T defaultValue) {
+      this.defaultValue = defaultValue;
+      return this;
+    }
+
+    @Override
+    public GameRuleSettings<T> onUpdate(ValueUpdateHandler<T> onUpdate) {
+      this.onUpdate = onUpdate;
+      return this;
+    }
+
+    @Override
+    public GameRuleSettings<T> validator(ValueValidator<T> validator) {
+      this.validator = validator;
+      return this;
+    }
+
+    @Override
+    public GameRuleSettings<T> description(String description) {
+      this.description = description;
+      return this;
+    }
+
+    public static <T> GameRuleSettings<T> copy(GameRuleSettings<T> o) {
+      if (o instanceof GameRuleSettingsImpl) {
+        GameRuleSettingsImpl<T> original = (GameRuleSettingsImpl<T>) o;
+        GameRuleSettingsImpl<T> copy = new GameRuleSettingsImpl<>(original.type);
+        copy.defaultValue = original.defaultValue;
+        copy.onUpdate = original.onUpdate;
+        copy.validator = original.validator;
+        copy.description = original.description;
+        return copy;
+      } else {
+        return GameRuleSettings.of(o.getType()).defaultValue(o.getDefaultValue())
+            .onUpdate(o.getUpdateHandler()).validator(o.getValidator())
+            .description(o.getDescription());
+      }
+    }
+
+    public static <T> GameRuleSettings<T> copy(GameRuleKey<T> key) {
+      return GameRuleSettings.of(key.getType()).defaultValue(key.getDefaultValue())
+          .validator(key.getValidator()).description(key.getDescription());
+    }
+
+    private static <T> T defaulted(T value, T defaultValue) {
+      return value == null ? defaultValue : value;
+    }
+
+    @Override
+    public T getDefaultValue() {
+      return defaulted(this.defaultValue, getType().getDefaultValue());
+    }
+
+    @Override
+    public String getDescription() {
+      return this.description;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public GameRuleType<T> getType() {
+      return defaulted(this.type, (GameRuleType<T>) GameRuleTypes.STRING);
+    }
+
+    @Override
+    public ValueUpdateHandler<T> getUpdateHandler() {
+      return defaulted(this.onUpdate, ValueUpdateHandler.noUpdate());
+    }
+
+    @Override
+    public ValueValidator<T> getValidator() {
+      return defaulted(this.validator, ValueValidator.alwaysValid());
     }
   }
 }

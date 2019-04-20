@@ -18,7 +18,7 @@ public final class GameRuleExtensions {
   public static final GameRuleKey<Object> DUMMY_KEY =
       (GameRuleKey<Object>) (Object) newKey(Constants.UNKNOWN_MOD_ID, "dummy - report as bug",
           GameRuleTypes.STRING, "errored value - report as bug", ValueUpdateHandler.noUpdate(),
-          ValueValidator.alwaysValid());
+          ValueValidator.alwaysValid(), null);
   @SuppressWarnings("unchecked")
   public static final GameRuleType<Object> DUMMY_TYPE =
       (GameRuleType<Object>) (Object) GameRuleTypes.STRING;
@@ -36,11 +36,12 @@ public final class GameRuleExtensions {
 
   @SuppressWarnings("unchecked")
   public static <T> GameRuleKey<T> newKey(String modId, String ruleName, GameRuleType<T> type,
-      T defaultValue, ValueUpdateHandler<T> onUpdate, ValueValidator<T> validator) {
+      T defaultValue, ValueUpdateHandler<T> onUpdate, ValueValidator<T> validator,
+      String descriptionKey) {
     GameRules.Key mcKey = new GameRules.Key(null, null, null);
     ((GameRuleExtensions.Key) mcKey).cg$initExtensions(modId, ruleName, (GameRuleType<Object>) type,
         defaultValue, (ValueUpdateHandler<Object>) onUpdate, (ValueValidator<Object>) validator,
-        false);
+        false, descriptionKey);
     return (GameRuleKey<T>) mcKey;
   }
 
@@ -48,7 +49,7 @@ public final class GameRuleExtensions {
   public static GameRuleKey<Object> initKeyDefault(String modId, String name, GameRules.Key key) {
     ((GameRuleExtensions.Key) key).cg$initExtensions(modId, name,
         (GameRuleType<Object>) getCGType(key.getType()), ((GameRuleKey<?>) key).getDefaultValue(),
-        null, ValueValidator.alwaysValid(), true);
+        null, ValueValidator.alwaysValid(), true, "gamerule." + modId + "." + name + ".desc");
     return (GameRuleKey<Object>) key;
   }
 
@@ -113,7 +114,7 @@ public final class GameRuleExtensions {
   public interface Key {
     void cg$initExtensions(String modId, String ruleName, GameRuleType<Object> type,
         Object defaultValue, @Nullable ValueUpdateHandler<Object> onUpdate,
-        ValueValidator<Object> validator, boolean cancelUpdateNoServer);
+        ValueValidator<Object> validator, boolean cancelUpdateNoServer, String descriptionKey);
 
     boolean cg$isInit();
   }

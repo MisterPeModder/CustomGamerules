@@ -5,6 +5,7 @@ import com.misterpemodder.customgamerules.impl.menu.EditGameRulesButton;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.client.gui.Screen;
 import net.minecraft.client.gui.menu.EditLevelScreen;
@@ -16,7 +17,9 @@ public abstract class MixinEditLevelScreen extends Screen {
     super(name);
   }
 
-  @Inject(at = @At("TAIL"), method = "init()V")
+  @Inject(at = @At(value = "INVOKE",
+      target = "Lnet/minecraft/client/gui/menu/EditLevelScreen;addButton", shift = Shift.AFTER,
+      ordinal = 4), method = "init()V")
   protected void onOnInitialized(CallbackInfo ci) {
     addButton(new EditGameRulesButton(this.width / 2 - 100, this.height / 4 + 144 + 5, 200, 20,
         StringUtil.translate("customgamerules.edit", "Edit Gamerules"), this));

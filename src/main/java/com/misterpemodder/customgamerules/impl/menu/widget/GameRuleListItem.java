@@ -71,7 +71,7 @@ public abstract class GameRuleListItem<V> extends GameRuleListWidget.ListItem
               + this.ruleKey.getDefaultValueAsString()));
     } else if (mouseY >= rowTop - 1 && mouseY <= rowTop + itemHeight + 2 && mouseX >= textLeft
         && mouseX <= rowLeft + 105) {
-      String key = "gamerule." + this.ruleKey.getModId() + "." + ruleName + ".desc";
+      String key = this.ruleKey.getDescription();
       List<String> tooltip = new ArrayList<>();
       tooltip.add(this.ruleName);
       if (I18n.hasTranslation(key))
