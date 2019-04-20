@@ -4,33 +4,34 @@ import java.util.List;
 import com.google.common.collect.ImmutableList;
 import com.misterpemodder.customgamerules.api.rule.key.GameRuleKey;
 import com.misterpemodder.customgamerules.api.rule.value.GameRuleValue;
-import com.misterpemodder.customgamerules.mixin.client.gui.widget.TextFieldPosAccessor;
+import com.misterpemodder.customgamerules.mixin.client.gui.widget.ButtonFocusAccessor;
 import org.lwjgl.glfw.GLFW;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 
 public class FieldGameRuleListItem<V> extends GameRuleListItem<V> {
-  private final TextFieldWidget editField;
+  private final HoverTextFieldWidget editField;
   private Element focusedElement = null;
 
-  public FieldGameRuleListItem(MinecraftClient client, String ruleName, GameRuleKey<V> ruleKey,
-      GameRuleValue<V> ruleValue) {
-    super(client, ruleName, ruleKey, ruleValue);
-    this.editField = new TextFieldWidget(this.client.textRenderer, 0, 0, 76, 20);
+  public FieldGameRuleListItem(GameRuleListWidget parent, MinecraftClient client, String modName,
+      GameRuleKey<V> ruleKey, GameRuleValue<V> ruleValue) {
+    super(parent, client, modName, ruleKey, ruleValue);
+    this.editField = new HoverTextFieldWidget(this.client.textRenderer, 0, 0, 76, 20, "");
     this.editField.setText(this.ruleKey.getDefaultValueAsString());
   }
 
   @SuppressWarnings("unchecked")
-  public static FieldGameRuleListItem<?> create(MinecraftClient client, String ruleName,
-      GameRuleKey<?> ruleKey, GameRuleValue<?> ruleValue) {
-    return new FieldGameRuleListItem<Object>(client, ruleName,
+  public static FieldGameRuleListItem<?> create(GameRuleListWidget gui, MinecraftClient client,
+      String modName, GameRuleKey<?> ruleKey, GameRuleValue<?> ruleValue) {
+    return new FieldGameRuleListItem<Object>(gui, client, modName,
         (GameRuleKey<Object>) (Object) ruleKey, (GameRuleValue<Object>) (Object) ruleValue);
   }
 
   @Override
   public void setFocused(boolean focused) {
-    this.editField.setFocused(focused);
+    ((ButtonFocusAccessor) this.editField).cg$setFocused(focused);
     this.focusedElement = focused ? this.editField : null;
   }
 
@@ -50,17 +51,17 @@ public class FieldGameRuleListItem<V> extends GameRuleListItem<V> {
       this.resetButton.onPress();
       this.resetButton.playDownSound(this.client.getSoundManager());
       this.focusedElement = this.editField;
-      this.editField.setFocused(true);
+      ((ButtonFocusAccessor) this.editField).cg$setFocused(true);
       return true;
     } else if (keyCode == GLFW.GLFW_KEY_LEFT && this.focusedElement != this.editField) {
       this.focusedElement = editField;
-      this.editField.setFocused(true);
+      ((ButtonFocusAccessor) this.editField).cg$setFocused(true);
       return true;
     } else if (keyCode == GLFW.GLFW_KEY_RIGHT
         && this.editField.getCursor() >= this.editField.getText().length()
         && this.resetButton.active) {
       this.focusedElement = this.resetButton;
-      this.editField.setFocused(false);
+      ((ButtonFocusAccessor) this.editField).cg$setFocused(false);
       return true;
     }
     return super.keyPressed(keyCode, int_2, int_3)
@@ -83,10 +84,11 @@ public class FieldGameRuleListItem<V> extends GameRuleListItem<V> {
   }
 
   @Override
-  public void render(int listX, int listY, int width, int height, int x, int y, int integer_7,
-      boolean selected, float partial) {
-    this.resetButton.active = !this.editField.getText().equals(this.ruleKey.getDefaultValue());
-    super.render(listX, listY, width, height, x, y, integer_7, selected, partial);
+  public void render(int index, int rowTop, int rowLeft, int itemWidth, int itemHeight, int mouseX,
+      int mouseY, boolean selected, float partial) {
+    this.resetButton.active =
+        !this.editField.getText().equals(this.ruleKey.getDefaultValueAsString());
+    super.render(index, rowTop, rowLeft, itemWidth, itemHeight, mouseX, mouseY, selected, partial);
 
     this.editField.method_1868(0xe0e0e0);
     try {
@@ -97,9 +99,9 @@ public class FieldGameRuleListItem<V> extends GameRuleListItem<V> {
       this.editField.method_1868(0xff5555);
     }
 
-    ((TextFieldPosAccessor) this.editField).cg$setXPos(width + 107);
-    ((TextFieldPosAccessor) this.editField).cg$setYPos(listY);
-    this.editField.render(y, integer_7, partial);
+    this.editField.x = rowLeft + 107;
+    this.editField.y = rowTop;
+    this.editField.render(mouseX, mouseY, partial);
   }
 
   @Override
@@ -121,5 +123,21 @@ public class FieldGameRuleListItem<V> extends GameRuleListItem<V> {
 
   public List<? extends Element> children() {
     return ImmutableList.of(this.editField, this.resetButton);
+  }
+
+  @Override
+  protected boolean isEditWidgetHovered(int mouseX, int mouseY) {
+    return this.editField.getIsHovered();
+  }
+
+  protected static class HoverTextFieldWidget extends TextFieldWidget {
+    public HoverTextFieldWidget(TextRenderer textRenderer, int x, int y, int width, int height,
+        String message) {
+      super(textRenderer, x, y, width, height, message);
+    }
+
+    public boolean getIsHovered() {
+      return this.isHovered;
+    }
   }
 }

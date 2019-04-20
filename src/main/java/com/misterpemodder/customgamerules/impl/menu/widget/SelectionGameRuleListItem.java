@@ -11,34 +11,31 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.util.math.MathHelper;
 
 public class SelectionGameRuleListItem<V> extends GameRuleListItem<V> {
-  private final ButtonWidget selectButton;
+  private final HoverButtonWidget selectButton;
   private final String[] values;
   private int selected;
   private final int initialIndex;
   private ButtonWidget focusedButton = null;
 
-  public SelectionGameRuleListItem(MinecraftClient client, String ruleName, GameRuleKey<V> ruleKey,
-      GameRuleValue<V> ruleValue, String[] values, int initialIndex) {
-    super(client, ruleName, ruleKey, ruleValue);
+  public SelectionGameRuleListItem(GameRuleListWidget parent, MinecraftClient client,
+      String modName, GameRuleKey<V> ruleKey, GameRuleValue<V> ruleValue, String[] values,
+      int initialIndex) {
+    super(parent, client, modName, ruleKey, ruleValue);
     this.selected = MathHelper.clamp(initialIndex, 0, values.length);
     this.values = values;
     this.initialIndex = initialIndex;
-    this.selectButton = new ButtonWidget(0, 0, 80, 20, this.values[initialIndex], b -> {
+    this.selectButton = new HoverButtonWidget(0, 0, 80, 20, this.values[initialIndex], b -> {
       if (++this.selected >= this.values.length)
         this.selected = 0;
       b.setMessage(this.values[this.selected]);
-    }) {
-      @Override
-      public boolean isHovered() {
-        return SelectionGameRuleListItem.this.focusedButton == this;
-      }
-    };
+    });
   }
 
   @SuppressWarnings("unchecked")
-  public static SelectionGameRuleListItem<?> create(MinecraftClient client, String ruleName,
-      GameRuleKey<?> ruleKey, GameRuleValue<?> ruleValue, String[] values, int initialIndex) {
-    return new SelectionGameRuleListItem<Object>(client, ruleName,
+  public static SelectionGameRuleListItem<?> create(GameRuleListWidget gui, MinecraftClient client,
+      String modName, GameRuleKey<?> ruleKey, GameRuleValue<?> ruleValue, String[] values,
+      int initialIndex) {
+    return new SelectionGameRuleListItem<Object>(gui, client, modName,
         (GameRuleKey<Object>) (Object) ruleKey, (GameRuleValue<Object>) (Object) ruleValue, values,
         initialIndex);
   }
@@ -78,14 +75,14 @@ public class SelectionGameRuleListItem<V> extends GameRuleListItem<V> {
   }
 
   @Override
-  public void render(int listX, int listY, int width, int height, int x, int y, int integer_7,
-      boolean selected, float partial) {
+  public void render(int index, int rowTop, int rowLeft, int itemWidth, int itemHeight, int mouseX,
+      int mouseY, boolean hovered, float partial) {
     this.resetButton.active =
-        !this.selectButton.getMessage().equals(this.ruleKey.getDefaultValue());
-    super.render(listX, listY, width, height, x, y, integer_7, selected, partial);
-    this.selectButton.x = width + 105;
-    this.selectButton.y = listY;
-    this.selectButton.render(y, integer_7, partial);
+        !this.selectButton.getMessage().equals(this.ruleKey.getDefaultValueAsString());
+    super.render(index, rowTop, rowLeft, itemWidth, itemHeight, mouseX, mouseY, hovered, partial);
+    this.selectButton.x = rowLeft + 105;
+    this.selectButton.y = rowTop;
+    this.selectButton.render(mouseX, mouseY, partial);
   }
 
   @Override
@@ -107,5 +104,26 @@ public class SelectionGameRuleListItem<V> extends GameRuleListItem<V> {
 
   public List<? extends Element> children() {
     return ImmutableList.of(this.selectButton, this.resetButton);
+  }
+
+  @Override
+  protected boolean isEditWidgetHovered(int mouseX, int mouseY) {
+    return this.selectButton.getIsHovered();
+  }
+
+  protected class HoverButtonWidget extends ButtonWidget {
+    public HoverButtonWidget(int x, int y, int width, int height, String message,
+        ButtonWidget.PressAction pressAction) {
+      super(x, y, width, height, message, pressAction);
+    }
+
+    public boolean getIsHovered() {
+      return this.isHovered;
+    }
+
+    @Override
+    public boolean isHovered() {
+      return this.isHovered || SelectionGameRuleListItem.this.focusedButton == this;
+    }
   }
 }

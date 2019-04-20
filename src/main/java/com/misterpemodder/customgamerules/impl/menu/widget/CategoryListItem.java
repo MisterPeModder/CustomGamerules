@@ -16,11 +16,11 @@ public class CategoryListItem extends GameRuleListWidget.ListItem
   }
 
   @Override
-  public void render(int listX, int listY, int width, int height, int x, int y, int integer_7,
-      boolean selected, float partial) {
+  public void render(int index, int rowTop, int rowLeft, int itemWidth, int itemHeight, int mouseX,
+      int mouseY, boolean hovered, float partial) {
     TextRenderer textRenderer = this.client.textRenderer;
     float str = (float) (this.client.currentScreen.width / 2 - this.nameWidth / 2);
-    textRenderer.draw(this.name, str, x + listY - 10, 0xFFFFFF);
+    textRenderer.draw(this.name, str, itemHeight + rowTop - 10, 0xFFFFFF);
   }
 
   @Override

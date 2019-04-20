@@ -27,7 +27,7 @@ import net.minecraft.client.gui.widget.ItemListWidget;
 import net.minecraft.util.math.MathHelper;
 
 public class GameRuleListWidget extends ItemListWidget<GameRuleListWidget.ListItem> {
-  private EditGameRulesScreen gui;
+  public final EditGameRulesScreen gui;
   private int selectedId;
   private int maxStringWidth;
 
@@ -75,11 +75,11 @@ public class GameRuleListWidget extends ItemListWidget<GameRuleListWidget.ListIt
         ret.put(modName, entries);
       }
       if (key.getType() == GameRuleTypes.BOOLEAN)
-        entries.add(SelectionGameRuleListItem.create(this.client, entry.getKey(), key,
+        entries.add(SelectionGameRuleListItem.create(this, this.client, modName, key,
             this.gui.rules.get(entry.getKey()), new String[] {"true", "false"},
             key.getDefaultValueAsString().equalsIgnoreCase("true") ? 0 : 1));
       else
-        entries.add(FieldGameRuleListItem.create(client, entry.getKey(), key,
+        entries.add(FieldGameRuleListItem.create(this, this.client, modName, key,
             this.gui.rules.get(entry.getKey())));
     }
     return ret;

@@ -5,7 +5,7 @@
   "mixins": [
     "gui.menu.MixinEditLevelScreen",
     "gui.menu.MixinScreen",
-    "gui.widget.TextFieldPosAccessor"
+    "gui.widget.ButtonFocusAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

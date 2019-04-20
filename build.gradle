@@ -26,10 +26,8 @@ dependencies {
 	modCompile "net.fabricmc:fabric-loader:$fabricLoaderVersion"
 	modCompile "net.fabricmc:fabric:$fabricApiVersion"
 
-	// modCompile "com.jamieswhiteshirt:developer-mode:1.0.3"
-
 	// Mod Menu
-	modCompile 'io.github.prospector.modmenu:ModMenu:1.2.1-50'
+	modCompile "io.github.prospector.modmenu:ModMenu:$modMenuVersion"
 
 	// Nullable annotations.
 	compile "com.google.code.findbugs:jsr305:3.0.0"
