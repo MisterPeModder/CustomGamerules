@@ -3,6 +3,7 @@ package com.misterpemodder.customgamerules.mixin.world;
 import java.util.function.BiConsumer;
 import com.misterpemodder.customgamerules.api.rule.key.GameRuleKey;
 import com.misterpemodder.customgamerules.api.rule.type.GameRuleType;
+import com.misterpemodder.customgamerules.api.rule.type.GameRuleType.InvalidGameRuleValueException;
 import com.misterpemodder.customgamerules.api.rule.value.GameRuleValue;
 import com.misterpemodder.customgamerules.api.rule.value.ValueUpdateHandler;
 import com.misterpemodder.customgamerules.api.rule.value.ValueValidator;
@@ -54,7 +55,11 @@ public final class MixinGameRulesKey implements GameRuleKey<Object>, GameRuleExt
       BiConsumer<MinecraftServer, GameRules.Value> onUpdate, CallbackInfo ci) {
     this.cg$initialized = false;
     this.cg$type = (GameRuleType<Object>) GameRuleExtensions.getCGType(type);
-    this.cg$defaultValueObj = this.cg$type.parse(defaultValue);
+    try {
+      this.cg$defaultValueObj = this.cg$type.parse(defaultValue);
+    } catch (InvalidGameRuleValueException e) {
+      this.cg$defaultValueObj = this.cg$type.getDefaultValue();
+    }
     this.cg$modId = Constants.UNKNOWN_MOD_ID;
     this.cg$ruleName = "errored rule name - report as bug";
     this.cg$onUpdate = GameRuleExtensions.DUMMY_UPDATE_HANDLER;

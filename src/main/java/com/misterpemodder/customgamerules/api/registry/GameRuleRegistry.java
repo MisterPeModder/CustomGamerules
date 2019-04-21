@@ -38,7 +38,7 @@ public interface GameRuleRegistry {
    * @param modId The registering mod id.
    * @param name  The game rule name.
    * @param type  Its type, if not registered this method
-   *                     will throw an {@link IllegalArgumentException}.
+   *                     will throw an {@link UnregisteredGameRuleTypeException}.
    * @return the registered rule.
    */
   public <T> GameRuleKey<T> register(String modId, String name, GameRuleType<T> type);
@@ -85,5 +85,14 @@ public interface GameRuleRegistry {
 
     @Nullable
     public String getDescription();
+  }
+
+  public static class UnregisteredGameRuleTypeException extends RuntimeException {
+    private static final long serialVersionUID = 15264932501L;
+
+    public UnregisteredGameRuleTypeException(String name, String modId, GameRuleType<?> type) {
+      super("Couldn't register gamerule " + modId + ":" + name + ", type " + type.getTypeName()
+          + " is not registered.");
+    }
   }
 }

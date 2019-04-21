@@ -99,4 +99,7 @@ public abstract class GameRuleListItem<V> extends GameRuleListWidget.ListItem
   protected void setTooltip(List<String> tooltip) {
     this.parent.gui.setTooltip(tooltip);
   }
+
+  @Override
+  public abstract void onSave();
 }

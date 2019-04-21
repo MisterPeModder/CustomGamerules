@@ -60,6 +60,16 @@ public class MixinGameRules implements CustomGameRules {
   }
 
   @Override
+  public void copyTo(GameRules target) {
+    copyTo((CustomGameRules) target);
+  }
+
+  @Override
+  public void copyTo(CustomGameRules target) {
+    target.getRules().putAll(getRules());
+  }
+
+  @Override
   @SuppressWarnings("unchecked")
   public TreeMap<String, GameRuleValue<?>> getRules() {
     return (TreeMap<String, GameRuleValue<?>>) (Object) rules;

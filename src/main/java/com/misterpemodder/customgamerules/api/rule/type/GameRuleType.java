@@ -33,10 +33,10 @@ public interface GameRuleType<V> {
    * 
    * @param source The source string.
    * @return The parsed value.
-   * @throws IllegalArgumentException If parsing failed.
+   * @throws InvalidGameRuleValueException If parsing failed.
    */
   @Nullable
-  V parse(String source) throws IllegalArgumentException;
+  V parse(String source) throws InvalidGameRuleValueException;
 
   /**
    * Converts the given value to a string.
@@ -67,5 +67,18 @@ public interface GameRuleType<V> {
    */
   default RequiredArgumentBuilder<ServerCommandSource, ?> createCommandArgument(String name) {
     return CommandManager.argument(name, getArgumentType());
+  }
+
+  public static class InvalidGameRuleValueException extends Exception {
+    private static final long serialVersionUID = 7229312786905033556L;
+
+    public InvalidGameRuleValueException(GameRuleType<?> type, String value) {
+      this(type, value, null);
+    }
+
+    public InvalidGameRuleValueException(GameRuleType<?> type, String value, Throwable cause) {
+      super("Failed to parse game rule value: Expected " + type.getTypeName() + ", got '" + value
+          + "'", cause);
+    }
   }
 }

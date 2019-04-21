@@ -39,16 +39,21 @@ public class EditGameRulesScreen extends Screen {
   protected void init() {
     this.minecraft.keyboard.enableRepeatEvents(true);
     this.saveButton = addButton(new ButtonWidget(this.width / 2 - 154, this.height - 28, 150, 20,
-        StringUtil.translate("selectWorld.edit.save", "Save"),
-        b -> this.onClose.accept(true, this.rules)));
+        StringUtil.translate("custom-gamerules.menu.save", "Save Changes"), b -> {
+          this.gameRuleList.save();
+          this.onClose.accept(true, this.rules);
+        }));
     this.cancelButton = addButton(new ButtonWidget(this.width / 2 + 4, this.height - 28, 150, 20,
-        StringUtil.translate("gui.cancel", "Cancel"), b -> this.onClose.accept(false, this.rules)));
+        StringUtil.translate("custom-gamerules.menu.discard", "Cancel & Discard changes"),
+        b -> this.onClose.accept(false, this.rules)));
     (this.searchBox = new TextFieldWidget(this.font, this.width / 2 - 100, 22, 200, 20,
-        StringUtil.translate("customgamerules.search", "Search"))).setChangedListener(text -> {
-          if (this.gameRuleList.filter(() -> text))
-            this.gameRuleList.capYPosition(0.0);
-          this.searchBox.method_1868(this.gameRuleList.children().isEmpty() ? 0xff5555 : 0xe0e0e0);
-        });
+        StringUtil.translate("custom-gamerules.menu.search", "Search")))
+            .setChangedListener(text -> {
+              if (this.gameRuleList.filter(() -> text))
+                this.gameRuleList.capYPosition(0.0);
+              this.searchBox
+                  .method_1868(this.gameRuleList.children().isEmpty() ? 0xff5555 : 0xe0e0e0);
+            });
     this.gameRuleList = new GameRuleListWidget(this, this.minecraft, this.width, this.height, 48,
         this.height - 36, 22, () -> this.searchBox.getText());
     ((ButtonFocusAccessor) this.searchBox).cg$setFocused(true);
@@ -75,7 +80,7 @@ public class EditGameRulesScreen extends Screen {
     renderBackground();
     this.tooltip = null;
     this.gameRuleList.render(mouseX, mouseY, delta);
-    this.drawString(this.font, StringUtil.translate("customgamerules.search", "Search"),
+    this.drawString(this.font, StringUtil.translate("custom-gamerules.menu.search", "Search"),
         this.width / 2 - 100, 9, 0xa0a0a0);
     this.searchBox.render(mouseX, mouseY, delta);
     super.render(mouseX, mouseY, delta);

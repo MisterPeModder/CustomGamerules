@@ -3,6 +3,7 @@ package com.misterpemodder.customgamerules.impl.menu.widget;
 import java.util.List;
 import com.google.common.collect.ImmutableList;
 import com.misterpemodder.customgamerules.api.rule.key.GameRuleKey;
+import com.misterpemodder.customgamerules.api.rule.type.GameRuleType.InvalidGameRuleValueException;
 import com.misterpemodder.customgamerules.api.rule.value.GameRuleValue;
 import org.lwjgl.glfw.GLFW;
 import net.minecraft.client.MinecraftClient;
@@ -14,16 +15,16 @@ public class SelectionGameRuleListItem<V> extends GameRuleListItem<V> {
   private final HoverButtonWidget selectButton;
   private final String[] values;
   private int selected;
-  private final int initialIndex;
+  private final int defaultIndex;
   private ButtonWidget focusedButton = null;
 
   public SelectionGameRuleListItem(GameRuleListWidget parent, MinecraftClient client,
       String modName, GameRuleKey<V> ruleKey, GameRuleValue<V> ruleValue, String[] values,
-      int initialIndex) {
+      int initialIndex, int defaultIndex) {
     super(parent, client, modName, ruleKey, ruleValue);
     this.selected = MathHelper.clamp(initialIndex, 0, values.length);
     this.values = values;
-    this.initialIndex = initialIndex;
+    this.defaultIndex = defaultIndex;
     this.selectButton = new HoverButtonWidget(0, 0, 80, 20, this.values[initialIndex], b -> {
       if (++this.selected >= this.values.length)
         this.selected = 0;
@@ -34,10 +35,10 @@ public class SelectionGameRuleListItem<V> extends GameRuleListItem<V> {
   @SuppressWarnings("unchecked")
   public static SelectionGameRuleListItem<?> create(GameRuleListWidget gui, MinecraftClient client,
       String modName, GameRuleKey<?> ruleKey, GameRuleValue<?> ruleValue, String[] values,
-      int initialIndex) {
+      int initialIndex, int defaultIndex) {
     return new SelectionGameRuleListItem<Object>(gui, client, modName,
         (GameRuleKey<Object>) (Object) ruleKey, (GameRuleValue<Object>) (Object) ruleValue, values,
-        initialIndex);
+        initialIndex, defaultIndex);
   }
 
   @Override
@@ -70,8 +71,8 @@ public class SelectionGameRuleListItem<V> extends GameRuleListItem<V> {
 
   @Override
   public void onReset() {
-    this.selected = this.initialIndex;
-    this.selectButton.setMessage(this.values[this.initialIndex]);
+    this.selected = this.defaultIndex;
+    this.selectButton.setMessage(this.values[this.defaultIndex]);
   }
 
   @Override
@@ -109,6 +110,15 @@ public class SelectionGameRuleListItem<V> extends GameRuleListItem<V> {
   @Override
   protected boolean isEditWidgetHovered(int mouseX, int mouseY) {
     return this.selectButton.getIsHovered();
+  }
+
+  @Override
+  public void onSave() {
+    try {
+      this.ruleValue.set(this.ruleValue.getType().parse(this.values[this.selected]), null);
+    } catch (InvalidGameRuleValueException e) {
+      this.ruleValue.set(this.ruleKey.getDefaultValue(), null);
+    }
   }
 
   protected class HoverButtonWidget extends ButtonWidget {

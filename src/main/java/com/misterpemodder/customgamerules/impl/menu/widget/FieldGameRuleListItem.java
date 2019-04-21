@@ -3,6 +3,7 @@ package com.misterpemodder.customgamerules.impl.menu.widget;
 import java.util.List;
 import com.google.common.collect.ImmutableList;
 import com.misterpemodder.customgamerules.api.rule.key.GameRuleKey;
+import com.misterpemodder.customgamerules.api.rule.type.GameRuleType.InvalidGameRuleValueException;
 import com.misterpemodder.customgamerules.api.rule.value.GameRuleValue;
 import com.misterpemodder.customgamerules.mixin.client.gui.widget.ButtonFocusAccessor;
 import org.lwjgl.glfw.GLFW;
@@ -19,7 +20,7 @@ public class FieldGameRuleListItem<V> extends GameRuleListItem<V> {
       GameRuleKey<V> ruleKey, GameRuleValue<V> ruleValue) {
     super(parent, client, modName, ruleKey, ruleValue);
     this.editField = new HoverTextFieldWidget(this.client.textRenderer, 0, 0, 76, 20, "");
-    this.editField.setText(this.ruleKey.getDefaultValueAsString());
+    this.editField.setText(this.ruleValue.getType().stringify(this.ruleValue.get()));
   }
 
   @SuppressWarnings("unchecked")
@@ -95,7 +96,7 @@ public class FieldGameRuleListItem<V> extends GameRuleListItem<V> {
       V parsedValue = this.ruleKey.getType().parse(this.editField.getText());
       if (!this.ruleKey.isValidValue(parsedValue))
         this.editField.method_1868(0xff5555);
-    } catch (IllegalArgumentException e) {
+    } catch (InvalidGameRuleValueException e) {
       this.editField.method_1868(0xff5555);
     }
 
@@ -138,6 +139,15 @@ public class FieldGameRuleListItem<V> extends GameRuleListItem<V> {
 
     public boolean getIsHovered() {
       return this.isHovered;
+    }
+  }
+
+  @Override
+  public void onSave() {
+    try {
+      this.ruleValue.set(this.ruleValue.getType().parse(this.editField.getText()), null);
+    } catch (InvalidGameRuleValueException e) {
+      this.ruleValue.set(this.ruleKey.getDefaultValue(), null);
     }
   }
 }

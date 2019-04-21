@@ -71,13 +71,11 @@ public class GameRuleTypeImpl<V> implements GameRuleType<V> {
   }
 
   @Override
-  public V parse(String source) throws IllegalArgumentException {
+  public V parse(String source) throws InvalidGameRuleValueException {
     try {
       return this.parseFunction.apply(source);
     } catch (RuntimeException e) {
-      throw new IllegalArgumentException(
-          "Failed to parse game rule value: Expected " + getTypeName() + ", got '" + source + "'",
-          e);
+      throw new InvalidGameRuleValueException(this, source, e);
     }
   }
 

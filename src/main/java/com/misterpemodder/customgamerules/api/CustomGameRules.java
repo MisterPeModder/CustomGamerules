@@ -26,6 +26,10 @@ public interface CustomGameRules {
     return (TreeMap<String, GameRuleKey<?>>) (Object) GameRules.getKeys();
   }
 
+  void copyTo(GameRules target);
+
+  void copyTo(CustomGameRules target);
+
   TreeMap<String, GameRuleValue<?>> getRules();
 
   GameRuleValue<?> get(String key);

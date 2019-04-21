@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 import com.misterpemodder.customgamerules.api.CustomGameRules;
 import com.misterpemodder.customgamerules.api.rule.key.GameRuleKey;
 import com.misterpemodder.customgamerules.api.rule.type.GameRuleTypes;
+import com.misterpemodder.customgamerules.api.rule.value.GameRuleValue;
 import com.misterpemodder.customgamerules.impl.Constants;
 import com.misterpemodder.customgamerules.impl.StringUtil;
 import com.misterpemodder.customgamerules.impl.menu.EditGameRulesScreen;
@@ -74,11 +75,12 @@ public class GameRuleListWidget extends ItemListWidget<GameRuleListWidget.ListIt
         entries = new TreeSet<>();
         ret.put(modName, entries);
       }
-      if (key.getType() == GameRuleTypes.BOOLEAN)
-        entries.add(SelectionGameRuleListItem.create(this, this.client, modName, key,
-            this.gui.rules.get(entry.getKey()), new String[] {"true", "false"},
-            key.getDefaultValueAsString().equalsIgnoreCase("true") ? 0 : 1));
-      else
+      GameRuleValue<?> ruleValue = this.gui.rules.get(entry.getKey());
+      if (key.getType() == GameRuleTypes.BOOLEAN) {
+        entries.add(SelectionGameRuleListItem.create(this, this.client, modName, key, ruleValue,
+            new String[] {"false", "true"}, (Boolean) ruleValue.get() ? 1 : 0,
+            (Boolean) key.getDefaultValue() ? 1 : 0));
+      } else
         entries.add(FieldGameRuleListItem.create(this, this.client, modName, key,
             this.gui.rules.get(entry.getKey())));
     }
@@ -223,11 +225,18 @@ public class GameRuleListWidget extends ItemListWidget<GameRuleListWidget.ListIt
     return true;
   }
 
+  public void save() {
+    this.children().forEach(ListItem::onSave);
+  }
+
   public abstract static class ListItem extends ItemListWidget.Item<ListItem> {
     public void setFocused(boolean focused) {
     }
 
     public void tick() {
+    }
+
+    public void onSave() {
     }
   }
 }

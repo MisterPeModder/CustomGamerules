@@ -39,8 +39,7 @@ public class GameRuleRegistryImpl implements GameRuleRegistry {
   public <T> GameRuleKey<T> register(String modId, String name, GameRuleSettings<T> settings) {
     GameRuleType<T> type = settings.getType();
     if (GameRuleRegistry.TYPE_REGISTRY.getId(type) == null)
-      throw new IllegalArgumentException("Couldn't register gamerule " + modId + ":" + name
-          + ", type " + type.getTypeName() + " is not registered.");
+      throw new UnregisteredGameRuleTypeException(name, modId, type);
     String descriptionKey = settings.getDescription();
     GameRuleKey<T> key = GameRuleExtensions.newKey(modId, name, type, settings.getDefaultValue(),
         settings.getUpdateHandler(), settings.getValidator(),

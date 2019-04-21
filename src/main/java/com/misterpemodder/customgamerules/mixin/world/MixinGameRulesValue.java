@@ -3,6 +3,7 @@ package com.misterpemodder.customgamerules.mixin.world;
 import java.util.function.BiConsumer;
 import com.misterpemodder.customgamerules.api.rule.key.GameRuleKey;
 import com.misterpemodder.customgamerules.api.rule.type.GameRuleType;
+import com.misterpemodder.customgamerules.api.rule.type.GameRuleType.InvalidGameRuleValueException;
 import com.misterpemodder.customgamerules.api.rule.value.GameRuleValue;
 import com.misterpemodder.customgamerules.impl.rule.GameRuleExtensions;
 import org.spongepowered.asm.mixin.Final;
@@ -133,8 +134,13 @@ public class MixinGameRulesValue implements GameRuleValue<Object>, GameRuleExten
       method = "Lnet/minecraft/world/GameRules$Value;set(Ljava/lang/String;Lnet/minecraft/server/MinecraftServer;)V",
       cancellable = true)
   public void onSet(String str, MinecraftServer server, CallbackInfo ci) {
-    if (this.cg$initialized)
-      set(this.cg$type.parse(str), server);
+    if (this.cg$initialized) {
+      try {
+        set(this.cg$type.parse(str), server);
+      } catch (InvalidGameRuleValueException e) {
+        set(this.cg$type.getDefaultValue(), server);
+      }
+    }
     ci.cancel();
   }
 }
