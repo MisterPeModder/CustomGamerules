@@ -7,5 +7,5 @@ import net.minecraft.client.gui.widget.AbstractButtonWidget;
 @Mixin(AbstractButtonWidget.class)
 public interface ButtonFocusAccessor {
   @Invoker("setFocused")
-  void cg$setFocused(boolean focused);
+  void cgr$setFocused(boolean focused);
 }

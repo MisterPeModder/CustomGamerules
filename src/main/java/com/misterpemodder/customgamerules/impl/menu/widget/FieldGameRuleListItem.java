@@ -32,7 +32,7 @@ public class FieldGameRuleListItem<V> extends GameRuleListItem<V> {
 
   @Override
   public void setFocused(boolean focused) {
-    ((ButtonFocusAccessor) this.editField).cg$setFocused(focused);
+    ((ButtonFocusAccessor) this.editField).cgr$setFocused(focused);
     this.focusedElement = focused ? this.editField : null;
   }
 
@@ -52,17 +52,17 @@ public class FieldGameRuleListItem<V> extends GameRuleListItem<V> {
       this.resetButton.onPress();
       this.resetButton.playDownSound(this.client.getSoundManager());
       this.focusedElement = this.editField;
-      ((ButtonFocusAccessor) this.editField).cg$setFocused(true);
+      ((ButtonFocusAccessor) this.editField).cgr$setFocused(true);
       return true;
     } else if (keyCode == GLFW.GLFW_KEY_LEFT && this.focusedElement != this.editField) {
       this.focusedElement = editField;
-      ((ButtonFocusAccessor) this.editField).cg$setFocused(true);
+      ((ButtonFocusAccessor) this.editField).cgr$setFocused(true);
       return true;
     } else if (keyCode == GLFW.GLFW_KEY_RIGHT
         && this.editField.getCursor() >= this.editField.getText().length()
         && this.resetButton.active) {
       this.focusedElement = this.resetButton;
-      ((ButtonFocusAccessor) this.editField).cg$setFocused(false);
+      ((ButtonFocusAccessor) this.editField).cgr$setFocused(false);
       return true;
     }
     return super.keyPressed(keyCode, int_2, int_3)

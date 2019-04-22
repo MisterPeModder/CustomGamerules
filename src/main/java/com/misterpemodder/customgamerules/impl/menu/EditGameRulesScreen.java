@@ -56,7 +56,7 @@ public class EditGameRulesScreen extends Screen {
             });
     this.gameRuleList = new GameRuleListWidget(this, this.minecraft, this.width, this.height, 48,
         this.height - 36, 22, () -> this.searchBox.getText());
-    ((ButtonFocusAccessor) this.searchBox).cg$setFocused(true);
+    ((ButtonFocusAccessor) this.searchBox).cgr$setFocused(true);
     this.children.add(this.searchBox);
     this.children.add(this.gameRuleList);
     setFocused(this.searchBox);
@@ -91,7 +91,7 @@ public class EditGameRulesScreen extends Screen {
   @Override
   public void setFocused(Element inputListener) {
     if (this.searchBox != null)
-      ((ButtonFocusAccessor) this.searchBox).cg$setFocused(inputListener == this.searchBox);
+      ((ButtonFocusAccessor) this.searchBox).cgr$setFocused(inputListener == this.searchBox);
     super.setFocused(inputListener);
   }
 

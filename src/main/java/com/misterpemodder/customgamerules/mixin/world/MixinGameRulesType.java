@@ -19,7 +19,7 @@ public class MixinGameRulesType {
   @Final
   @Mutable
   private Supplier<ArgumentType<?>> argumentType;
-  //private ThreadLocal<Supplier<ArgumentType<?>>> cg$argumentTypeSupplier = new ThreadLocal<>();
+  //private ThreadLocal<Supplier<ArgumentType<?>>> cgr$argumentTypeSupplier = new ThreadLocal<>();
 
   @Inject(at = @At(value = "HEAD"),
       method = "Lnet/minecraft/world/GameRules$Type;set"
@@ -29,7 +29,7 @@ public class MixinGameRulesType {
       GameRules.Value value, CallbackInfo ci) {
     // TODO Finsh custom types handling in commands.
     //gameRules$Value_1.set(this.field_9207.apply(commandContext_1, string_1), ((ServerCommandSource)commandContext_1.getSource()).getMinecraftServer());
-    //this.cg$argumentTypeSupplier
+    //this.cgr$argumentTypeSupplier
     //    .set(new ArgumentTypeSupplier(((GameRuleValue<?>) value).getType()));
   }
 
@@ -41,6 +41,6 @@ public class MixinGameRulesType {
           + "(Lcom/mojang/brigadier/context/CommandContext;"
           + "Ljava/lang/String;Lnet/minecraft/world/GameRules$Value;)V")
   private Supplier<ArgumentType<?>> changeArgumentTypeSupplier(GameRules.Type owner) {
-    return this.cg$argumentTypeSupplier.get();
+    return this.cgr$argumentTypeSupplier.get();
   }*/
 }

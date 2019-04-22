@@ -38,58 +38,58 @@ public final class MixinGameRulesKey implements GameRuleKey<Object>, GameRuleExt
   private BiConsumer<MinecraftServer, GameRules.Value> field_9204;
 
   // CustomGameRules Extensions
-  private boolean cg$initialized;
-  private Object cg$defaultValueObj;
-  private String cg$modId;
-  private String cg$ruleName;
-  private GameRuleType<Object> cg$type;
-  private ValueUpdateHandler<Object> cg$onUpdate;
-  private ValueValidator<Object> cg$validator;
-  private boolean cg$cancelUpdateNoServer;
-  private String cg$descriptionKey;
+  private boolean cgr$initialized;
+  private Object cgr$defaultValueObj;
+  private String cgr$modId;
+  private String cgr$ruleName;
+  private GameRuleType<Object> cgr$type;
+  private ValueUpdateHandler<Object> cgr$onUpdate;
+  private ValueValidator<Object> cgr$validator;
+  private boolean cgr$cancelUpdateNoServer;
+  private String cgr$descriptionKey;
 
   @SuppressWarnings("unchecked")
   @Inject(at = @At("RETURN"),
       method = "<init>(Ljava/lang/String;Lnet/minecraft/world/GameRules$Type;Ljava/util/function/BiConsumer;)V")
   public void onInit(String defaultValue, GameRules.Type type,
       BiConsumer<MinecraftServer, GameRules.Value> onUpdate, CallbackInfo ci) {
-    this.cg$initialized = false;
-    this.cg$type = (GameRuleType<Object>) GameRuleExtensions.getCGType(type);
+    this.cgr$initialized = false;
+    this.cgr$type = (GameRuleType<Object>) GameRuleExtensions.getCGType(type);
     try {
-      this.cg$defaultValueObj = this.cg$type.parse(defaultValue);
+      this.cgr$defaultValueObj = this.cgr$type.parse(defaultValue);
     } catch (InvalidGameRuleValueException e) {
-      this.cg$defaultValueObj = this.cg$type.getDefaultValue();
+      this.cgr$defaultValueObj = this.cgr$type.getDefaultValue();
     }
-    this.cg$modId = Constants.UNKNOWN_MOD_ID;
-    this.cg$ruleName = "errored rule name - report as bug";
-    this.cg$onUpdate = GameRuleExtensions.DUMMY_UPDATE_HANDLER;
-    this.cg$validator = GameRuleExtensions.DUMMY_VALIDATOR;
-    this.cg$cancelUpdateNoServer = true;
-    this.cg$descriptionKey = "errored description - report as bug";
+    this.cgr$modId = Constants.UNKNOWN_MOD_ID;
+    this.cgr$ruleName = "errored rule name - report as bug";
+    this.cgr$onUpdate = GameRuleExtensions.DUMMY_UPDATE_HANDLER;
+    this.cgr$validator = GameRuleExtensions.DUMMY_VALIDATOR;
+    this.cgr$cancelUpdateNoServer = true;
+    this.cgr$descriptionKey = "errored description - report as bug";
   }
 
   @Override
-  public boolean cg$isInit() {
-    return this.cg$initialized;
+  public boolean cgr$isInit() {
+    return this.cgr$initialized;
   }
 
   @Override
-  public void cg$initExtensions(String modId, String ruleName, GameRuleType<Object> type,
+  public void cgr$initExtensions(String modId, String ruleName, GameRuleType<Object> type,
       Object defaultValue, ValueUpdateHandler<Object> onUpdate, ValueValidator<Object> validator,
       boolean cancelUpdateNoServer, String descriptionKey) {
-    this.cg$initialized = true;
-    this.cg$modId = modId;
-    this.cg$ruleName = ruleName;
-    this.cg$type = type;
-    this.cg$validator = validator;
-    this.cg$defaultValueObj = defaultValue;
-    this.cg$cancelUpdateNoServer = cancelUpdateNoServer;
-    this.cg$descriptionKey = descriptionKey;
+    this.cgr$initialized = true;
+    this.cgr$modId = modId;
+    this.cgr$ruleName = ruleName;
+    this.cgr$type = type;
+    this.cgr$validator = validator;
+    this.cgr$defaultValueObj = defaultValue;
+    this.cgr$cancelUpdateNoServer = cancelUpdateNoServer;
+    this.cgr$descriptionKey = descriptionKey;
 
     if (onUpdate == null) {
-      this.cg$onUpdate = GameRuleExtensions.getCGUpdateHandler(this.field_9204);
+      this.cgr$onUpdate = GameRuleExtensions.getCGUpdateHandler(this.field_9204);
     } else {
-      this.cg$onUpdate = onUpdate;
+      this.cgr$onUpdate = onUpdate;
       this.field_9204 = GameRuleExtensions.getVanillaUpdateHandler(onUpdate);
     }
 
@@ -99,7 +99,7 @@ public final class MixinGameRulesKey implements GameRuleKey<Object>, GameRuleExt
 
   @Override
   public Object getDefaultValue() {
-    return this.cg$defaultValueObj;
+    return this.cgr$defaultValueObj;
   }
 
   @Override
@@ -109,48 +109,48 @@ public final class MixinGameRulesKey implements GameRuleKey<Object>, GameRuleExt
 
   @Override
   public String getModId() {
-    return this.cg$modId;
+    return this.cgr$modId;
   }
 
   @Override
   public String getName() {
-    return this.cg$ruleName;
+    return this.cgr$ruleName;
   }
 
   @Override
   public GameRuleType<Object> getType() {
-    return this.cg$type;
+    return this.cgr$type;
   }
 
   @Override
   public ValueUpdateHandler<Object> getUpdateHandler() {
-    return this.cg$onUpdate;
+    return this.cgr$onUpdate;
   }
 
   @Override
   public ValueValidator<Object> getValidator() {
-    return this.cg$validator;
+    return this.cgr$validator;
   }
 
   @Override
   public void onValueUpdate(MinecraftServer server, GameRuleValue<Object> value) {
-    if (server != null || !this.cg$cancelUpdateNoServer)
-      this.cg$onUpdate.after(server, value);
+    if (server != null || !this.cgr$cancelUpdateNoServer)
+      this.cgr$onUpdate.after(server, value);
   }
 
   @Override
   public boolean isValidValue(Object value) {
-    return this.cg$validator.isValid(value);
+    return this.cgr$validator.isValid(value);
   }
 
   @Override
   public GameRuleValue<Object> createValue() {
-    return GameRuleExtensions.newValue(this.cg$type, this);
+    return GameRuleExtensions.newValue(this.cgr$type, this);
   }
 
   @Override
   public String getDescription() {
-    return this.cg$descriptionKey;
+    return this.cgr$descriptionKey;
   }
 
   @Inject(at = @At("HEAD"), method = "Lnet/minecraft/world/GameRules$Key;createValue()"

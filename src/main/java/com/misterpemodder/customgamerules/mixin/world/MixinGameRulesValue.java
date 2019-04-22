@@ -40,63 +40,63 @@ public class MixinGameRulesValue implements GameRuleValue<Object>, GameRuleExten
   private BiConsumer<MinecraftServer, GameRules.Value> applyConsumer;
 
   // CustomGameRules Extensions
-  private boolean cg$initialized;
-  private GameRuleType<Object> cg$type;
-  private GameRuleKey<Object> cg$key;
-  private Object cg$value;
-  private boolean cg$valueUpdated;
+  private boolean cgr$initialized;
+  private GameRuleType<Object> cgr$type;
+  private GameRuleKey<Object> cgr$key;
+  private Object cgr$value;
+  private boolean cgr$valueUpdated;
 
   @Inject(at = @At("RETURN"),
       method = "<init>(Ljava/lang/String;Lnet/minecraft/world/GameRules$Type;Ljava/util/function/BiConsumer;)V")
   public void onInit(CallbackInfo ci) {
-    this.cg$initialized = false;
-    this.cg$type = GameRuleExtensions.DUMMY_TYPE;
-    this.cg$key = GameRuleExtensions.DUMMY_KEY;
-    this.cg$value = this.cg$type.getDefaultValue();
-    this.cg$valueUpdated = true;
+    this.cgr$initialized = false;
+    this.cgr$type = GameRuleExtensions.DUMMY_TYPE;
+    this.cgr$key = GameRuleExtensions.DUMMY_KEY;
+    this.cgr$value = this.cgr$type.getDefaultValue();
+    this.cgr$valueUpdated = true;
   }
 
   @Override
-  public void cg$initExtensions(GameRuleType<Object> type, GameRuleKey<Object> key) {
-    this.cg$initialized = true;
-    this.cg$type = type;
-    this.cg$key = key;
-    this.cg$value = type.getDefaultValue();
+  public void cgr$initExtensions(GameRuleType<Object> type, GameRuleKey<Object> key) {
+    this.cgr$initialized = true;
+    this.cgr$type = type;
+    this.cgr$key = key;
+    this.cgr$value = type.getDefaultValue();
 
     this.type = GameRuleExtensions.getVanillaType(type);
     this.applyConsumer = GameRuleExtensions.getVanillaUpdateHandler(this);
   }
 
   @Override
-  public boolean cg$isInit() {
-    return this.cg$initialized;
+  public boolean cgr$isInit() {
+    return this.cgr$initialized;
   }
 
   @Override
   public Object get() {
-    return this.cg$value;
+    return this.cgr$value;
   }
 
   @Override
   public GameRuleKey<Object> getKey() {
-    return this.cg$key;
+    return this.cgr$key;
   }
 
   @Override
   public GameRuleType<Object> getType() {
-    return this.cg$type;
+    return this.cgr$type;
   }
 
   @Override
   public void set(Object value, MinecraftServer server) {
-    this.cg$value = value;
-    this.cg$valueUpdated = true;
-    this.cg$key.onValueUpdate(server, this);
+    this.cgr$value = value;
+    this.cgr$valueUpdated = true;
+    this.cgr$key.onValueUpdate(server, this);
   }
 
   @Unique
-  private void cg$updateCachedValues() {
-    String str = this.cg$type.stringify(this.cg$value);
+  private void cgr$updateCachedValues() {
+    String str = this.cgr$type.stringify(this.cgr$value);
     this.asString = str;
     this.asBoolean = Boolean.parseBoolean(str);
     this.asInteger = this.asBoolean ? 1 : 0;
@@ -114,31 +114,31 @@ public class MixinGameRulesValue implements GameRuleValue<Object>, GameRuleExten
   @Inject(at = @At("HEAD"),
       method = "Lnet/minecraft/world/GameRules$Value;getString()Ljava/lang/String;")
   public void onGetString(CallbackInfoReturnable<String> ci) {
-    if (this.cg$valueUpdated)
-      cg$updateCachedValues();
+    if (this.cgr$valueUpdated)
+      cgr$updateCachedValues();
   }
 
   @Inject(at = @At("HEAD"), method = "Lnet/minecraft/world/GameRules$Value;getBoolean()Z")
   public void onGetBoolean(CallbackInfoReturnable<Boolean> ci) {
-    if (this.cg$valueUpdated)
-      cg$updateCachedValues();
+    if (this.cgr$valueUpdated)
+      cgr$updateCachedValues();
   }
 
   @Inject(at = @At("HEAD"), method = "Lnet/minecraft/world/GameRules$Value;getInteger()I")
   public void onGetInteger(CallbackInfoReturnable<Integer> ci) {
-    if (this.cg$valueUpdated)
-      cg$updateCachedValues();
+    if (this.cgr$valueUpdated)
+      cgr$updateCachedValues();
   }
 
   @Inject(at = @At("HEAD"),
       method = "Lnet/minecraft/world/GameRules$Value;set(Ljava/lang/String;Lnet/minecraft/server/MinecraftServer;)V",
       cancellable = true)
   public void onSet(String str, MinecraftServer server, CallbackInfo ci) {
-    if (this.cg$initialized) {
+    if (this.cgr$initialized) {
       try {
-        set(this.cg$type.parse(str), server);
+        set(this.cgr$type.parse(str), server);
       } catch (InvalidGameRuleValueException e) {
-        set(this.cg$type.getDefaultValue(), server);
+        set(this.cgr$type.getDefaultValue(), server);
       }
     }
     ci.cancel();

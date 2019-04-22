@@ -31,7 +31,7 @@ public final class GameRuleExtensions {
 
 
   public static boolean isKeyInitialized(GameRules.Key key) {
-    return ((GameRuleExtensions.Key) key).cg$isInit();
+    return ((GameRuleExtensions.Key) key).cgr$isInit();
   }
 
   @SuppressWarnings("unchecked")
@@ -39,36 +39,36 @@ public final class GameRuleExtensions {
       T defaultValue, ValueUpdateHandler<T> onUpdate, ValueValidator<T> validator,
       String descriptionKey) {
     GameRules.Key mcKey = new GameRules.Key(null, null, null);
-    ((GameRuleExtensions.Key) mcKey).cg$initExtensions(modId, ruleName, (GameRuleType<Object>) type,
-        defaultValue, (ValueUpdateHandler<Object>) onUpdate, (ValueValidator<Object>) validator,
-        false, descriptionKey);
+    ((GameRuleExtensions.Key) mcKey).cgr$initExtensions(modId, ruleName,
+        (GameRuleType<Object>) type, defaultValue, (ValueUpdateHandler<Object>) onUpdate,
+        (ValueValidator<Object>) validator, false, descriptionKey);
     return (GameRuleKey<T>) mcKey;
   }
 
   @SuppressWarnings("unchecked")
   public static GameRuleKey<Object> initKeyDefault(String modId, String name, GameRules.Key key) {
-    ((GameRuleExtensions.Key) key).cg$initExtensions(modId, name,
+    ((GameRuleExtensions.Key) key).cgr$initExtensions(modId, name,
         (GameRuleType<Object>) getCGType(key.getType()), ((GameRuleKey<?>) key).getDefaultValue(),
         null, ValueValidator.alwaysValid(), true, "gamerule." + modId + "." + name + ".desc");
     return (GameRuleKey<Object>) key;
   }
 
   public static boolean isValueInitialized(GameRules.Value key) {
-    return ((GameRuleExtensions.Value) key).cg$isInit();
+    return ((GameRuleExtensions.Value) key).cgr$isInit();
   }
 
   @SuppressWarnings("unchecked")
   public static <T> GameRuleValue<T> newValue(GameRuleType<T> type, GameRuleKey<T> key) {
     GameRules.Value mcValue =
         new GameRules.Value(key.getDefaultValueAsString(), getVanillaType(type), null);
-    ((GameRuleExtensions.Value) mcValue).cg$initExtensions((GameRuleType<Object>) type,
+    ((GameRuleExtensions.Value) mcValue).cgr$initExtensions((GameRuleType<Object>) type,
         (GameRuleKey<Object>) key);
     return (GameRuleValue<T>) mcValue;
   }
 
   @SuppressWarnings("unchecked")
   public static GameRuleValue<Object> initValueDefault(GameRuleKey<?> key, GameRules.Value value) {
-    ((GameRuleExtensions.Value) value).cg$initExtensions((GameRuleType<Object>) key.getType(),
+    ((GameRuleExtensions.Value) value).cgr$initExtensions((GameRuleType<Object>) key.getType(),
         (GameRuleKey<Object>) key);
     return (GameRuleValue<Object>) value;
   }
@@ -112,16 +112,16 @@ public final class GameRuleExtensions {
   }
 
   public interface Key {
-    void cg$initExtensions(String modId, String ruleName, GameRuleType<Object> type,
+    void cgr$initExtensions(String modId, String ruleName, GameRuleType<Object> type,
         Object defaultValue, @Nullable ValueUpdateHandler<Object> onUpdate,
         ValueValidator<Object> validator, boolean cancelUpdateNoServer, String descriptionKey);
 
-    boolean cg$isInit();
+    boolean cgr$isInit();
   }
 
   public interface Value {
-    void cg$initExtensions(GameRuleType<Object> type, GameRuleKey<Object> key);
+    void cgr$initExtensions(GameRuleType<Object> type, GameRuleKey<Object> key);
 
-    boolean cg$isInit();
+    boolean cgr$isInit();
   }
 }
