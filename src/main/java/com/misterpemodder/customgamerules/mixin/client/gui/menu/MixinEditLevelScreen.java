@@ -24,8 +24,10 @@ public abstract class MixinEditLevelScreen extends Screen {
   }
 
   @Inject(at = @At(value = "INVOKE",
-      target = "Lnet/minecraft/client/gui/menu/EditLevelScreen;addButton", shift = Shift.AFTER,
-      ordinal = 4), method = "init()V")
+      target = "Lnet/minecraft/client/gui/menu/EditLevelScreen;addButton"
+          + "(Lnet/minecraft/client/gui/widget/AbstractButtonWidget;)"
+          + "Lnet/minecraft/client/gui/widget/AbstractButtonWidget;",
+      shift = Shift.AFTER, ordinal = 4), method = "init()V")
   protected void onOnInitialized(CallbackInfo ci) {
     addButton(new EditGameRulesButton(this.width / 2 - 100, this.height / 4 + 144 + 5, 200, 20,
         StringUtil.translate("custom-gamerules.menu.edit", "Edit Gamerules"), this,
